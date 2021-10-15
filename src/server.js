@@ -1,13 +1,16 @@
 import express from 'express';
 import { getDb } from './database.js';
+import { getFile } from '../src/File.js';
 
-const getServer = async () => {
+const getServer = async ({ databaseOptions } = {}) => {
   let db;
   try {
-    db = await getDb();
+    db = await getDb(databaseOptions);
   } catch (e) {
     console.error(e);
   }
+
+  const File = await getFile(db);
 
   const app = express();
 
@@ -16,8 +19,14 @@ const getServer = async () => {
 
   // Start server
   app.server = app.listen(PORT, () => {
-    console.log('Server running on port %PORT%'.replace('%PORT%', PORT));
+    // console.log('Server running on port %PORT%'.replace('%PORT%', PORT));
   });
+
+  app.close = () => {
+    // console.log('Gracefully stopping server and database');
+    app.server?.close();
+    db?.close();
+  };
 
   // Root endpoint
   app.get('/', (req, res, next) => {
@@ -27,11 +36,27 @@ const getServer = async () => {
   // Insert here other API endpoints
 
   app.get('/api/files', (req, res, next) => {
-    // var sql = 'select * from user';
-    const stmt = db.prepare('SELECT * FROM file');
-    const info = stmt.all();
-    console.log(info);
-    res.json(info);
+    let result;
+    try {
+      result = File.GetAll();
+    } catch (e) {
+      console.error(e);
+      res.json({ error: true });
+      return;
+    }
+    res.json(result);
+  });
+
+  app.get('/api/file/:path', (req, res, next) => {
+    let result;
+    try {
+      result = File.GetOne({ path: req.params.path }) || {};
+    } catch (e) {
+      console.error(e);
+      res.json({ error: true });
+      return;
+    }
+    res.json(result);
   });
 
   // Default response for any other request
@@ -39,7 +64,7 @@ const getServer = async () => {
     res.status(404);
   });
 
-  return { app };
+  return { app, db };
 };
 
 export { getServer };

@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 
-const getDb = async ({ path = 'data/default.db' }) => {
+const getDb = async ({ path = 'data/default.db' } = {}) => {
   let db;
 
   try {
@@ -27,24 +27,24 @@ const getDb = async ({ path = 'data/default.db' }) => {
     shouldAddTableContent = false;
   }
 
-  if (shouldAddTableContent) {
-    try {
-      const insert = db.prepare(
-        'INSERT INTO file (name, path) VALUES (@name,@path)'
-      );
+  // if (shouldAddTableContent) {
+  //   try {
+  //     const insert = db.prepare(
+  //       'INSERT INTO file (name, path) VALUES (@name,@path)'
+  //     );
 
-      const insertMany = db.transaction((files) => {
-        for (const file of files) insert.run(file);
-      });
+  //     const insertMany = db.transaction((files) => {
+  //       for (const file of files) insert.run(file);
+  //     });
 
-      insertMany([
-        { name: 'mmp-tech', path: '/tmp/mmp-tech' },
-        { name: 'mmp-books', path: '/tmp/mmp-books' },
-      ]);
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  //     insertMany([
+  //       { name: 'mmp-tech', path: '/tmp/mmp-tech' },
+  //       { name: 'mmp-books', path: '/tmp/mmp-books' },
+  //     ]);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
   return db;
 };
 

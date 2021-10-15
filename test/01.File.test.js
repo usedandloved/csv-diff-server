@@ -1,9 +1,13 @@
-import { expect } from 'chai';
+import chai from 'chai';
+import chaiExclude from 'chai-exclude';
 
 import { getDb } from '../src/database.js';
 import { getFile } from '../src/File.js';
 
-describe.only('File model ', () => {
+chai.use(chaiExclude);
+const { expect } = chai;
+
+describe('File model ', () => {
   let db, File;
 
   before(async () => {
@@ -33,15 +37,12 @@ describe.only('File model ', () => {
 
   it('GetAll ', async () => {
     const actual = File.GetAll();
-    expect(actual).to.have.lengthOf(2);
-    expect(actual[0]).to.include({
-      name: 'mmp-test-3',
-      path: '/tmp/mmp-test-1',
-    });
-    expect(actual[1]).to.include({
-      name: 'mmp-test-2',
-      path: '/tmp/mmp-test-2',
-    });
+    expect(actual)
+      .excluding('id')
+      .to.deep.equal([
+        { name: 'mmp-test-3', path: '/tmp/mmp-test-1' },
+        { name: 'mmp-test-2', path: '/tmp/mmp-test-2' },
+      ]);
   });
 
   it('Delete ', async () => {

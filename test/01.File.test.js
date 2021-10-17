@@ -7,7 +7,21 @@ import { getFile } from '../src/File.js';
 chai.use(chaiExclude);
 const { expect } = chai;
 
-describe('File model ', () => {
+const sample1 = {
+  dataset: 'sample',
+  revision: 'v1',
+  source: `http://localhost:3000/test/base-test.csv`,
+  path: '/tmp/mmp-test-1',
+};
+
+const sample2 = {
+  dataset: 'sample',
+  revision: 'v2',
+  source: `http://localhost:3000/test/delta-test.csv`,
+  path: '/tmp/mmp-test-2',
+};
+
+xdescribe('File model ', () => {
   let db, File;
 
   before(async () => {
@@ -21,17 +35,17 @@ describe('File model ', () => {
   });
 
   it('Create ', async () => {
-    const actual = File.Create({ name: 'mmp-test-1', path: '/tmp/mmp-test-1' });
+    const actual = File.Create(sample1);
     expect(actual).to.include({ changes: 1 });
   });
 
   it('Create ', async () => {
-    const actual = File.Create({ name: 'mmp-test-2', path: '/tmp/mmp-test-2' });
+    const actual = File.Create(sample2);
     expect(actual).to.include({ changes: 1 });
   });
 
   it('Update ', async () => {
-    const actual = File.Update({ name: 'mmp-test-3', path: '/tmp/mmp-test-1' });
+    const actual = File.Update({ revision: 'v3', path: '/tmp/mmp-test-1' });
     expect(actual).to.include({ changes: 1 });
   });
 
@@ -39,10 +53,15 @@ describe('File model ', () => {
     const actual = File.GetAll();
     expect(actual)
       .excluding('id')
-      .to.deep.equal([
-        { name: 'mmp-test-3', path: '/tmp/mmp-test-1' },
-        { name: 'mmp-test-2', path: '/tmp/mmp-test-2' },
-      ]);
+      .to.deep.equal([{ ...sample1, revision: 'v3' }, sample2]);
+  });
+
+  it('GetByDatasetRevision ', async () => {
+    const actual = File.GetByDatasetRevision({
+      dataset: 'sample',
+      revision: 'v2',
+    });
+    expect(actual).excluding('id').to.deep.equal(sample2);
   });
 
   it('Delete ', async () => {

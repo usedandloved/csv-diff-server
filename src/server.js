@@ -1,6 +1,7 @@
 import express from 'express';
 import { getDb } from './database.js';
 import { getFile } from '../src/File.js';
+import { diff } from '../src/diff.js';
 
 const getServer = async ({ databaseOptions } = {}) => {
   let db;
@@ -8,25 +9,22 @@ const getServer = async ({ databaseOptions } = {}) => {
     db = await getDb(databaseOptions);
   } catch (e) {
     console.error(e);
+    throw e;
   }
 
   const File = await getFile(db);
 
   const app = express();
 
+  app.use(express.json());
+
   // Server port
   const PORT = 3000;
 
-  // Start server
-  app.server = app.listen(PORT, () => {
-    // console.log('Server running on port %PORT%'.replace('%PORT%', PORT));
-  });
+  // app.close = async () => {
+  //   console.log("Gracefully stopping server and database");
 
-  app.close = () => {
-    // console.log('Gracefully stopping server and database');
-    app.server?.close();
-    db?.close();
-  };
+  // };
 
   // Root endpoint
   app.get('/', (req, res, next) => {
@@ -35,14 +33,13 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   // Insert here other API endpoints
 
-  app.get('/api/files', (req, res, next) => {
+  app.get('/api/files', async (req, res, next) => {
     let result;
     try {
-      result = File.GetAll();
+      result = (await File.GetAll()) || [];
     } catch (e) {
       console.error(e);
-      res.json({ error: true });
-      return;
+      return res.json({ error: true });
     }
     res.json(result);
   });
@@ -53,16 +50,61 @@ const getServer = async ({ databaseOptions } = {}) => {
       result = File.GetOne({ path: req.params.path }) || {};
     } catch (e) {
       console.error(e);
-      res.json({ error: true });
-      return;
+      return res.json({ error: true });
     }
     res.json(result);
   });
+
+  app.post('/api/file', (req, res, next) => {
+    console.log(req.body);
+    // try {
+    //   result = File.GetOne({ path: req.params.path }) || {};
+    // } catch (e) {
+    //   console.error(e);
+    //   return res.json({ error: true });
+    // }
+    // 0. Is file already cached? Get from database.
+    // 1. Download the file
+    // 2. Create row in db
+    // 3. Return row
+    res.send(req.body);
+    // let result;
+    // try {
+    //   result = File.GetOne({ path: req.params.path }) || {};
+    // } catch (e) {
+    //   console.error(e);
+    //   return res.json({ error: true });
+    // }
+    // res.json(result);
+  });
+
+  app.post('/api/diff', async (req, res, next) => {
+    try {
+      await diff(req.body, File);
+    } catch (e) {
+      console.log(e);
+    }
+
+    res.send(req.body);
+  });
+
+  if ('test' === process.env.APP_ENV) {
+    app.use('/test', express.static('/app/test/public'));
+  }
 
   // Default response for any other request
   app.use(function (req, res) {
     res.status(404);
   });
+
+  // Start server
+  try {
+    app.server = await app.listen(PORT, () => {
+      // console.log('Server running on port %PORT%'.replace('%PORT%', PORT));
+    });
+  } catch (e) {
+    console.error(e);
+  }
 
   return { app, db };
 };

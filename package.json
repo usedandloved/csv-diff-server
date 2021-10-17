@@ -12,6 +12,7 @@
   },
   "author": "davey",
   "dependencies": {
+    "@cfworker/json-schema": "^1.9.0",
     "@fast-csv/parse": "^4.3.6",
     "better-sqlite3": "^7.4.3",
     "csv-write-stream": "^2.0.0",

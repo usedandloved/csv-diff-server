@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@cfworker/json-schema@^1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@cfworker/json-schema/-/json-schema-1.9.0.tgz#54c2aa04aed8614c3859e738eee2a577cdc72c86"
+  integrity sha512-N13LOpIXZkgOE2Ujo7OYtWalazqUQu00uG6SfLlmUN/L7EF+UjT1ZDtK5eyxbTkUGr7nGXmWVtHb7KPBnayVcA==
+
 "@fast-csv/parse@^4.3.6":
   version "4.3.6"
   resolved "https://registry.yarnpkg.com/@fast-csv/parse/-/parse-4.3.6.tgz#ee47d0640ca0291034c7aa94039a744cfb019264"

@@ -2,14 +2,18 @@ const getFile = async (db) => {
   // return { Create: '' };
 
   const insert = db.prepare(
-    'INSERT INTO file (name, path) VALUES (@name,@path)'
+    'INSERT INTO file ( path, dataset, revision, source) VALUES (@path,@dataset,@revision,@source)'
   );
 
   const update = db.prepare(
-    'UPDATE file SET name = (@name) WHERE path = (@path)'
+    'UPDATE file SET revision = (@revision) WHERE path = (@path)'
   );
 
   const get = db.prepare('SELECT * FROM file WHERE path = (@path)');
+
+  const getByDatasetRevision = db.prepare(
+    'SELECT * FROM file WHERE dataset = (@dataset) AND revision = (@revision)'
+  );
 
   const getAll = db.prepare('SELECT * FROM file');
 
@@ -29,6 +33,10 @@ const getFile = async (db) => {
     GetOne: (params) => {
       // console.log('get all csv');
       return get.get(params);
+    },
+    GetByDatasetRevision: (params) => {
+      // console.log(params);
+      return getByDatasetRevision.get(params);
     },
     GetAll: () => {
       // console.log('get all csv');

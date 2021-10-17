@@ -16,9 +16,12 @@ const getDb = async ({ path = 'data/default.db' } = {}) => {
     const stmt = db.prepare(`
     CREATE TABLE file (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name text,
       path text UNIQUE,
+      dataset text,
+      source text,
+      revision text,
       CONSTRAINT path_unique UNIQUE (path)
+      CONSTRAINT dataset_revision_unique UNIQUE (dataset,revision)
     )`);
     stmt.run();
   } catch (e) {

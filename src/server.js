@@ -1,7 +1,25 @@
 import express from 'express';
 import { getDb } from './database.js';
-import { getFile } from '../src/File.js';
-import { diff } from '../src/diff.js';
+import { getFile } from './models/File.js';
+import diff from '../src/index.js';
+
+let server;
+
+/**
+ * Disconnect ngrok and close server on restart or shutdown
+ * Reference: https://stackoverflow.com/a/14032965/6671505
+ */
+process.stdin.resume();
+async function exitHandler(options, exitCode) {
+  console.log('In exitHandler');
+  await server.close();
+  if (exitCode || exitCode === 0) console.log(exitCode);
+  if (options.exit) process.exit();
+}
+process.on('SIGINT', exitHandler.bind(null, { exit: true }));
+process.on('SIGUSR1', exitHandler.bind(null, { exit: true }));
+process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
+process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
 
 const getServer = async ({ databaseOptions } = {}) => {
   let db;
@@ -99,12 +117,16 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   // Start server
   try {
-    app.server = await app.listen(PORT, () => {
+    server = app.listen(PORT, () => {
       // console.log('Server running on port %PORT%'.replace('%PORT%', PORT));
     });
   } catch (e) {
     console.error(e);
   }
+
+  app.close = async () => {
+    await Promise.all([server.close(), db.close()]);
+  };
 
   return { app, db };
 };

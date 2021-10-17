@@ -5,10 +5,6 @@ const getFile = async (db) => {
     'INSERT INTO file ( path, dataset, revision, source) VALUES (@path,@dataset,@revision,@source)'
   );
 
-  const update = db.prepare(
-    'UPDATE file SET revision = (@revision) WHERE path = (@path)'
-  );
-
   const get = db.prepare('SELECT * FROM file WHERE path = (@path)');
 
   const getByDatasetRevision = db.prepare(
@@ -16,6 +12,15 @@ const getFile = async (db) => {
   );
 
   const getAll = db.prepare('SELECT * FROM file');
+
+  const update = db.prepare(
+    'UPDATE file SET revision = (@revision) WHERE path = (@path)'
+  );
+
+  const updateByDatasetRevision = db.prepare(
+    `UPDATE file SET path = (@path) 
+     WHERE dataset = (@dataset) AND revision = (@revision)`
+  );
 
   const deleteOne = db.prepare('DELETE FROM file WHERE path = (@path)');
 
@@ -26,10 +31,7 @@ const getFile = async (db) => {
       // console.log('creating csv', params);
       return insert.run(params);
     },
-    Update: (params) => {
-      // console.log('creating csv', params);
-      return update.run(params);
-    },
+
     GetOne: (params) => {
       // console.log('get all csv');
       return get.get(params);
@@ -41,6 +43,14 @@ const getFile = async (db) => {
     GetAll: () => {
       // console.log('get all csv');
       return getAll.all();
+    },
+    Update: (params) => {
+      // console.log('creating csv', params);
+      return update.run(params);
+    },
+    UpdateByDatasetRevision: (params) => {
+      // console.log('creating csv', params);
+      return updateByDatasetRevision.run(params);
     },
     Delete: (params) => {
       // console.log('deleting csv', params);

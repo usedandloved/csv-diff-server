@@ -26,37 +26,29 @@ describe.only('Server diff 2 ', () => {
 
   before(async () => {
     try {
-      await app?.server?.close();
       ({ app, db } = await getServer({
         databaseOptions: { path: 'data/test.db' },
       }));
-      // console.log(2);
-      // await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // console.log(db);
       deleteAll = db.prepare('DELETE FROM file');
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      await deleteAll.run();
+      // await new Promise((resolve) => setTimeout(resolve, 500));
+      deleteAll.run();
     } catch (e) {
       console.error(e);
       return reject();
     }
-    console.log(3);
-    return;
+  });
 
-    // return;
-    console.log(1);
-
-    // done();
-    return;
-
-    // done();
+  after(async () => {
+    try {
+      await app.close();
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   it('post : diff', async () => {
     expect(200).to.equal(200);
     // await deleteAll.run();
-    return;
     const body = {
       base: {
         dataset: 'sample',
@@ -70,10 +62,9 @@ describe.only('Server diff 2 ', () => {
       },
     };
     // One liner to make sure file is being served.
-    const a = (await fetch(body.base.source)).status;
-    const b = (await fetch(body.delta.source)).status;
-    expect(a).to.equal(200);
-    expect(b).to.equal(200);
+
+    expect((await fetch(body.base.source)).status).to.equal(200);
+    expect((await fetch(body.delta.source)).status).to.equal(200);
 
     const response = await fetch(`http://localhost:3000/api/diff`, {
       method: 'post',
@@ -109,16 +100,4 @@ describe.only('Server diff 2 ', () => {
 
     // const actual = await response.text();
   }).timeout(15000);
-
-  after(async () => {
-    try {
-      const r1 = await app.server.close();
-      const r2 = await db.close();
-      console.log('gracefully stopping');
-      // console.log(12);
-    } catch (e) {
-      console.error(e);
-    } // await new Promise((resolve) => setTimeout(resolve, 500));
-    // await app?.close();
-  });
 });

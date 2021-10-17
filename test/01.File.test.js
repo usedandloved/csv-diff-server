@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiExclude from 'chai-exclude';
 
 import { getDb } from '../src/database.js';
-import { getFile } from '../src/File.js';
+import { getFile } from '../src/models/File.js';
 
 chai.use(chaiExclude);
 const { expect } = chai;

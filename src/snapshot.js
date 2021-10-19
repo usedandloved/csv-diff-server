@@ -8,7 +8,6 @@ const processSnapshot = async (File, { dataset, source, revision }) => {
 
   if (!dataset) dataset = 'default';
 
-  // console.log(dataset, snapshot);
   file = await File.GetByDatasetRevision({
     dataset,
     revision,

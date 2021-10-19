@@ -1,7 +1,8 @@
 import express from 'express';
 import { getDb } from './database.js';
 import { getFile } from './models/File.js';
-import diff from '../src/index.js';
+import getDiff from './index.js';
+import { paths } from './lib/fs.js';
 
 let server;
 
@@ -97,14 +98,16 @@ const getServer = async ({ databaseOptions } = {}) => {
   });
 
   app.post('/api/diff', async (req, res, next) => {
+    let diff;
     try {
-      await diff(req.body, File);
+      diff = await getDiff(req.body, File);
     } catch (e) {
       console.log(e);
     }
-
-    res.send(req.body);
+    res.send(diff);
   });
+
+  app.use('/data', express.static(paths.data));
 
   if ('test' === process.env.APP_ENV) {
     app.use('/test', express.static('/app/test/public'));

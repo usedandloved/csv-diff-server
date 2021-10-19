@@ -2,6 +2,11 @@ import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
 
+const paths = {
+  url: process.env.PATHS_URL?.replace(/\/$/, '') || '',
+  data: process.env.PATHS_DIFF || `/app/data`,
+};
+
 const downloadFile = async (source, target, options = {}) => {
   await fs.ensureDir(path.dirname(target));
 
@@ -24,4 +29,4 @@ const downloadFile = async (source, target, options = {}) => {
   );
 };
 
-export { downloadFile };
+export { paths, downloadFile };

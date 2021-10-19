@@ -21,7 +21,7 @@ export default async ({ base, delta, target }) => {
       const script = exec(
         `
         mkdir -p ${path.dirname(target)}
-        csvdiff ${base} ${delta} -o rowmark --time >> ${target} 
+        csvdiff ${base} ${delta} -o rowmark --time > ${target} 
         wc -l < ${target}
         `
       );

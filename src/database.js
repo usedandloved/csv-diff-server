@@ -1,11 +1,14 @@
 import Database from 'better-sqlite3';
+import fs from 'fs-extra';
+import path from 'path';
 
-const getDb = async ({ path = 'data/default.db' } = {}) => {
+const getDb = async ({ target = 'data/default.db' } = {}) => {
   let db;
 
   try {
+    await fs.ensureDir(path.dirname(target));
     // db = new Database(path, { verbose: console.log });
-    db = new Database(path);
+    db = new Database(target);
   } catch (e) {
     console.error(e);
     throw err;

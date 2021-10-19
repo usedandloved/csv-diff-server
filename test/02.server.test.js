@@ -36,8 +36,12 @@ xdescribe('Server ', () => {
     await deleteAll.run();
   });
 
-  after(async function () {
-    await app?.close?.();
+  after(async () => {
+    try {
+      await app.close();
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   it('api/files : empty', async () => {
@@ -63,8 +67,8 @@ xdescribe('Server ', () => {
     expect(actual).excluding('id').to.deep.equal([sample1, sample2]);
   });
 
-  it('api/file  : found', async () => {
-    await insert.run(sample1);
+  xit('api/file  : found', async () => {
+    // await insert.run(sample1);
 
     const response = await fetch(
       `http://localhost:3000/api/file/${encodeURIComponent(sample1.path)}`

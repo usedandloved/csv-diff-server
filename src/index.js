@@ -1,8 +1,10 @@
 import { Validator } from '@cfworker/json-schema';
 
 import { processSnapshot } from './snapshot.js';
-import csvdiff from './lib/csvdiff.js';
 import { diffParamsSchema } from './schemas.js';
+
+import { paths } from './lib/fs.js';
+import csvdiff from './lib/csvdiff.js';
 
 const validator = new Validator(diffParamsSchema);
 
@@ -15,7 +17,7 @@ export default async (params, File) => {
   const base = await processSnapshot(File, params.base);
   const delta = await processSnapshot(File, params.delta);
 
-  let target = `/app/data/diffs/${base.file.dataset}`;
+  let target = `${paths.data}/diffs/${base.file.dataset}`;
   if (base.file.dataset !== delta.file.dataset) {
     target += `-${delta.file.dataset}`;
   }
@@ -27,7 +29,13 @@ export default async (params, File) => {
     target,
   });
 
-  console.log(diffResult);
-
-  return;
+  return {
+    base,
+    delta,
+    diff: {
+      lineCount: diffResult.lineCount,
+      path: diffResult.target,
+      url: diffResult.target.replace(paths.data, `${paths.url}/data`),
+    },
+  };
 };

@@ -3,6 +3,7 @@ import chaiExclude from 'chai-exclude';
 import fetch from 'node-fetch';
 
 import { getServer } from '../src/server.js';
+import { paths } from '../src/lib/fs.js';
 
 // chai.use(chaiExclude);
 const { expect } = chai;
@@ -21,7 +22,7 @@ const sample2 = {
   path: null,
 };
 
-describe.only('Server diff 2 ', () => {
+describe('Server diff 2 ', () => {
   let app, db, deleteAll;
 
   before(async () => {
@@ -47,16 +48,15 @@ describe.only('Server diff 2 ', () => {
   });
 
   it('post : diff', async () => {
-    expect(200).to.equal(200);
     // await deleteAll.run();
     const body = {
       base: {
-        dataset: 'sample',
+        dataset: sample1.dataset,
         source: sample1.source,
         revision: sample1.revision,
       },
       delta: {
-        dataset: 'sample',
+        dataset: sample2.dataset,
         source: sample2.source,
         revision: sample2.revision,
       },
@@ -66,13 +66,41 @@ describe.only('Server diff 2 ', () => {
     expect((await fetch(body.base.source)).status).to.equal(200);
     expect((await fetch(body.delta.source)).status).to.equal(200);
 
-    const response = await fetch(`http://localhost:3000/api/diff`, {
+    const apiResponse = await fetch(`http://localhost:3000/api/diff`, {
       method: 'post',
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json' },
     });
 
-    // const actual = await response.text();
+    // console.log({ response });
+
+    const apiJson = await apiResponse.json();
+
+    expect(apiJson).to.deep.equal({
+      base: {
+        file: {
+          ...body.base,
+          path: `${paths.data}/snapshots/sample/v1.csv`,
+        },
+        done: ['created', 'downloaded'],
+      },
+      delta: {
+        file: {
+          ...body.delta,
+          path: `${paths.data}/snapshots/sample/v2.csv`,
+        },
+        done: ['created', 'downloaded'],
+      },
+      diff: {
+        lineCount: 1,
+        path: `${paths.data}/diffs/sample/v1-v2.csv`,
+        url: `${paths.url}/data/diffs/sample/v1-v2.csv`,
+      },
+    });
+
+    const dataResponse = await fetch(apiJson.diff.url);
+    const data = await dataResponse.text();
+    expect(data).to.equal('v1,v2e,MODIFIED\n');
   }).timeout(15000);
 
   xit('post : diff', async () => {

@@ -8,11 +8,17 @@ import csvdiff from './lib/csvdiff.js';
 
 const validator = new Validator(diffParamsSchema);
 
-export default async (params, File) => {
+export default async (params, File, Diff) => {
   if (!validator.validate(params)?.valid) {
     console.error('invalid params');
     return;
   }
+  let diff;
+
+  // diff = await Diff.GetByFiles({
+  //   dataset,
+  //   revision,
+  // });
 
   const base = await processSnapshot(File, params.base);
   const delta = await processSnapshot(File, params.delta);

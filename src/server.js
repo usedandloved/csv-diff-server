@@ -1,7 +1,8 @@
 import express from 'express';
 import { getDb } from './database.js';
 import { getFile } from './models/File.js';
-import getDiff from './index.js';
+import { getDiff } from './models/Diff.js';
+import main from './index.js';
 import { paths } from './lib/fs.js';
 
 let server;
@@ -32,6 +33,7 @@ const getServer = async ({ databaseOptions } = {}) => {
   }
 
   const File = await getFile(db);
+  const Diff = await getDiff(db);
 
   const app = express();
 
@@ -100,7 +102,7 @@ const getServer = async ({ databaseOptions } = {}) => {
   app.post('/api/diff', async (req, res, next) => {
     let diff;
     try {
-      diff = await getDiff(req.body, File);
+      diff = await main(req.body, File, Diff);
     } catch (e) {
       console.log(e);
     }

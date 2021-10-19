@@ -11,25 +11,45 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     db = new Database(target);
   } catch (e) {
     console.error(e);
-    throw err;
+    throw e;
   }
 
   let shouldAddTableContent = true;
   try {
     const stmt = db.prepare(`
+
+
     CREATE TABLE file (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      path text UNIQUE,
-      dataset text,
-      source text,
-      revision text,
-      CONSTRAINT path_unique UNIQUE (path)
-      CONSTRAINT dataset_revision_unique UNIQUE (dataset,revision)
+      id         INTEGER   PRIMARY KEY AUTOINCREMENT,
+      path       text      UNIQUE,
+      dataset    text,
+      source     text,
+      revision   text,
+      CONSTRAINT path_unique               UNIQUE (path)
+      CONSTRAINT dataset_revision_unique   UNIQUE (dataset,revision)
     )`);
     stmt.run();
   } catch (e) {
     // Table already created
     // console.error(e);
+    shouldAddTableContent = false;
+  }
+  try {
+    const stmt = db.prepare(` 
+    CREATE TABLE diff (
+      id             INTEGER   PRIMARY KEY AUTOINCREMENT,
+      path           text      UNIQUE,
+      base_file_id   INTEGER   NOT NULL,
+      delta_file_id  INTEGER   NOT NULL,
+      FOREIGN KEY (base_file_id) 
+        REFERENCES file(id),
+      FOREIGN KEY (delta_file_id) 
+        REFERENCES file(id)
+    )`);
+    // stmt.run();
+  } catch (e) {
+    // Table already created
+    console.error(e);
     shouldAddTableContent = false;
   }
 

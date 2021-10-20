@@ -5,6 +5,7 @@ import path from 'path';
 const paths = {
   url: process.env.PATHS_URL?.replace(/\/$/, '') || '',
   data: process.env.PATHS_DIFF || `/app/data`,
+  database: process.env.PATHS_DATABASE || `/app/data/default.db`,
 };
 
 const downloadFile = async (source, target, options = {}) => {

@@ -22,7 +22,7 @@ const sample2 = {
   path: '/tmp/mmp-test-2',
 };
 
-describe.only('Diff model ', () => {
+describe('Diff model ', () => {
   let db, Diff, File;
 
   before(async () => {

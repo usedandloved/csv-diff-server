@@ -11,14 +11,14 @@ const { expect } = chai;
 const sample1 = {
   dataset: 'sample',
   revision: 'v1',
-  source: `http://localhost:3000/test/base-test.csv`,
+  source: `${paths.url}/test/base-test.csv`,
   path: null,
 };
 
 const sample2 = {
   dataset: 'sample',
   revision: 'v2',
-  source: `http://localhost:3000/test/delta-test.csv`,
+  source: `${paths.url}/test/delta-test.csv`,
   path: null,
 };
 
@@ -66,7 +66,9 @@ describe('Server diff 2 ', () => {
     expect((await fetch(body.base.source)).status).to.equal(200);
     expect((await fetch(body.delta.source)).status).to.equal(200);
 
-    const apiResponse = await fetch(`http://localhost:3000/api/diff`, {
+    console.log(JSON.stringify(body));
+
+    const apiResponse = await fetch(`${paths.url}/api/diff`, {
       method: 'post',
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json' },
@@ -120,7 +122,7 @@ describe('Server diff 2 ', () => {
     expect((await fetch(body.base.source)).status).to.equal(200);
     expect((await fetch(body.delta.source)).status).to.equal(200);
 
-    const response = await fetch(`http://localhost:3000/api/diff`, {
+    const response = await fetch(`${paths.url}/api/diff`, {
       method: 'post',
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json' },

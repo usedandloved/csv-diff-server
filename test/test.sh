@@ -22,7 +22,7 @@ docker run -d --rm -t \
   --env-file=$SCRIPT_DIR/.env \
   -e APP_ENV=test \
   -w=/app \
-  -p3000:3000 \
+  -p3001:3001 \
   --entrypoint /bin/ash \
   ${CONTAINER_NAME}
 

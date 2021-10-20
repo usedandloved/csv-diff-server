@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  csv-diff-server:
+    hostname: csv-diff-server
+    build:
+      context: ./
+      dockerfile: dev.Dockerfile
+    ports:
+      - 3000:3000/tcp
+    working_dir: /app
+    volumes:
+      - .:/app
+      - csv_diff_server_node_modules:/app/node_modules
+    # - - - - - - -
+    command: []
+    entrypoint: ['/bin/ash']
+    tty: true
+    stdin_open: true
+    # - - - - - - -
+
+volumes:
+  csv_diff_server_node_modules:

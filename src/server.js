@@ -2,13 +2,14 @@ import express from 'express';
 import { getDb } from './database.js';
 import { getFile } from './models/File.js';
 import { getDiff } from './models/Diff.js';
-import main from './index.js';
+import main from './main.js';
 import { paths } from './lib/fs.js';
 
 let server;
+const port = process.env.PORT || 3000;
 
 /**
- * Disconnect ngrok and close server on restart or shutdown
+ * Close server on restart or shutdown
  * Reference: https://stackoverflow.com/a/14032965/6671505
  */
 process.stdin.resume();
@@ -37,19 +38,26 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   const app = express();
 
-  app.use(express.json());
+  app.set('views', '/app/src/views');
 
-  // Server port
-  const PORT = 3000;
+  app.set('view engine', 'ejs');
+
+  app.use(express.json());
 
   // app.close = async () => {
   //   console.log("Gracefully stopping server and database");
 
   // };
 
-  // Root endpoint
-  app.get('/', (req, res, next) => {
-    res.json({ message: 'Ok' });
+  // index page
+  app.get('/', async (req, res) => {
+    let files;
+    try {
+      files = (await File.GetAll()) || [];
+    } catch (e) {
+      console.error(e);
+    }
+    res.render('pages/index.ejs', { files });
   });
 
   // Insert here other API endpoints
@@ -122,8 +130,8 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   // Start server
   try {
-    server = app.listen(PORT, () => {
-      // console.log('Server running on port %PORT%'.replace('%PORT%', PORT));
+    server = app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
     });
   } catch (e) {
     console.error(e);
@@ -136,4 +144,4 @@ const getServer = async ({ databaseOptions } = {}) => {
   return { app, db };
 };
 
-export { getServer };
+export { getServer, port };

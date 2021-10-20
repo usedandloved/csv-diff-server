@@ -25,7 +25,7 @@ describe('File model ', () => {
   let db, File;
 
   before(async () => {
-    db = await getDb({ target: 'data/test.db' });
+    db = await getDb({ target: './data/test.db' });
     File = await getFile(db);
     File.DeleteAll();
   });

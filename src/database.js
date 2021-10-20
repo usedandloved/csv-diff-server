@@ -42,6 +42,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       path           text       UNIQUE,
       base_file_id   INTEGER    NOT NULL,
       delta_file_id  INTEGER    NOT NULL,
+      line_count     INTEGER    NOT NULL,
       flag_hash      text       NOT NULL,
       format         text       NOT NULL,
       created_at     integer(4) not null default (strftime('%s','now')),

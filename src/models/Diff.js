@@ -4,9 +4,9 @@ const getDiff = async (db) => {
   const insert = db.prepare(
     ` 
     INSERT INTO diff 
-      (base_file_id, delta_file_id, path, flag_hash, format) 
+      (base_file_id, delta_file_id, path, flag_hash, format, line_count) 
     VALUES
-      (@base_file_id, @delta_file_id, @path, @flag_hash, @format)`
+      (@base_file_id, @delta_file_id, @path, @flag_hash, @format, @line_count)`
   );
 
   // const get = db.prepare('SELECT * FROM diff WHERE id = (@id)');

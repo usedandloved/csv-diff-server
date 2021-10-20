@@ -48,6 +48,12 @@ const diffParamsSchema = {
         },
       },
     },
+    postProcess: {
+      type: 'object',
+      properties: {
+        batchSize: { type: 'integer', minimum: 1 },
+      },
+    },
   },
 };
 

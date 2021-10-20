@@ -5,6 +5,7 @@ import { diffParamsSchema } from './schemas.js';
 
 import { paths } from './lib/fs.js';
 import csvdiff, { processFlags } from './lib/csvdiff.js';
+import { postProcess } from './lib/postProcess.js';
 
 const validator = new Validator(diffParamsSchema);
 
@@ -64,7 +65,7 @@ export default async (params, File, Diff) => {
       target,
     });
 
-    // console.log(diffResult);
+    console.log(diffResult);
 
     try {
       await Diff.Create({
@@ -72,6 +73,7 @@ export default async (params, File, Diff) => {
         delta_file_id: delta.file.id,
         ...diffResult,
         flag_hash: flagHash,
+        line_count: diffResult.lineCount,
         format,
       });
     } catch (e) {
@@ -83,6 +85,10 @@ export default async (params, File, Diff) => {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  if ('rowmark' === format && params.postProcess) {
+    postProcess(diff, params.postProcess);
   }
 
   return {

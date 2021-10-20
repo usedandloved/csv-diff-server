@@ -1,9 +1,9 @@
 const getDiff = async (db) => {
   // return { Create: '' };
 
-  // const insert = db.prepare(
-  //   'INSERT INTO diff ( base_file_id, delta_file_id) VALUES (@base_file_id,@delta_file_id)'
-  // );
+  const insert = db.prepare(
+    'INSERT INTO diff ( base_file_id, delta_file_id, path) VALUES (@base_file_id,@delta_file_id, @path)'
+  );
 
   // const get = db.prepare('SELECT * FROM diff WHERE id = (@id)');
 
@@ -11,7 +11,7 @@ const getDiff = async (db) => {
   //   'SELECT * FROM file WHERE dataset = (@dataset) AND revision = (@revision)'
   // );
 
-  // const getAll = db.prepare('SELECT * FROM file');
+  const getAll = db.prepare('SELECT * FROM diff');
 
   // const update = db.prepare(
   //   'UPDATE file SET revision = (@revision) WHERE path = (@path)'
@@ -27,10 +27,10 @@ const getDiff = async (db) => {
   // const deleteAll = db.prepare('DELETE FROM file');
 
   return {
-    // Create: (params) => {
-    //   // console.log('creating csv', params);
-    //   return insert.run(params);
-    // },
+    Create: (params) => {
+      // console.log('creating diff', params);
+      return insert.run(params);
+    },
     // GetOne: (params) => {
     //   // console.log('get all csv');
     //   return get.get(params);
@@ -39,10 +39,14 @@ const getDiff = async (db) => {
     //   // console.log(params);
     //   return getByDatasetRevision.get(params);
     // },
-    // GetAll: () => {
-    //   // console.log('get all csv');
-    //   return getAll.all();
-    // },
+    GetByFilesAndFlags: (params) => {
+      // console.log(params);
+      return getByDatasetRevision.get(params);
+    },
+    GetAll: () => {
+      console.log('get all diffs');
+      return getAll.all();
+    },
     // Update: (params) => {
     //   // console.log('creating csv', params);
     //   return update.run(params);

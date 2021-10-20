@@ -22,6 +22,11 @@ const processSnapshot = async (File, { dataset, source, revision }) => {
     file = { dataset, source, revision, path: null };
     try {
       await File.Create(file);
+      // Get the file (with id).
+      file = await File.GetByDatasetRevision({
+        dataset,
+        revision,
+      });
     } catch (e) {
       throw e;
     }

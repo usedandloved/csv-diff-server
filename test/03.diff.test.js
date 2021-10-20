@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 import { getServer } from '../src/server.js';
 import { paths } from '../src/lib/fs.js';
 
-// chai.use(chaiExclude);
+chai.use(chaiExclude);
 const { expect } = chai;
 
 const sample1 = {
@@ -22,17 +22,19 @@ const sample2 = {
   path: null,
 };
 
-describe('Server diff 2 ', () => {
-  let app, db, deleteAll;
+describe.only('Server diff 2 ', () => {
+  let app, db, deleteAllDiff, deleteAllFile;
 
   before(async () => {
     try {
       ({ app, db } = await getServer({
-        databaseOptions: { path: 'data/test.db' },
+        databaseOptions: { target: paths.database },
       }));
-      deleteAll = db.prepare('DELETE FROM file');
+      deleteAllDiff = db.prepare('DELETE FROM diff');
+      deleteAllFile = db.prepare('DELETE FROM file');
       // await new Promise((resolve) => setTimeout(resolve, 500));
-      deleteAll.run();
+      await deleteAllDiff.run();
+      await deleteAllFile.run();
     } catch (e) {
       console.error(e);
       return reject();
@@ -60,13 +62,22 @@ describe('Server diff 2 ', () => {
         source: sample2.source,
         revision: sample2.revision,
       },
+      flags: {
+        format: 'rowmark',
+        // columns: '1,2',
+        // 'ignore-columns': '1',
+        // include: '1',
+        // 'primary-key': '1',
+        // separator: ',',
+        time: true,
+      },
     };
     // One liner to make sure file is being served.
 
     expect((await fetch(body.base.source)).status).to.equal(200);
     expect((await fetch(body.delta.source)).status).to.equal(200);
 
-    console.log(JSON.stringify(body));
+    // console.log(JSON.stringify(body));
 
     const apiResponse = await fetch(`${paths.url}/api/diff`, {
       method: 'post',
@@ -78,27 +89,29 @@ describe('Server diff 2 ', () => {
 
     const apiJson = await apiResponse.json();
 
-    expect(apiJson).to.deep.equal({
-      base: {
-        file: {
-          ...body.base,
-          path: `${paths.data}/snapshots/sample/v1.csv`,
-        },
-        done: ['created', 'downloaded'],
-      },
-      delta: {
-        file: {
-          ...body.delta,
-          path: `${paths.data}/snapshots/sample/v2.csv`,
-        },
-        done: ['created', 'downloaded'],
-      },
-      diff: {
-        lineCount: 1,
-        path: `${paths.data}/diffs/sample/v1-v2.csv`,
-        url: `${paths.url}/data/diffs/sample/v1-v2.csv`,
-      },
-    });
+    // expect(apiJson)
+    //   .excludingEvery('id')
+    //   .to.deep.equal({
+    //     base: {
+    //       file: {
+    //         ...body.base,
+    //         path: `${paths.data}/snapshots/sample/v1.csv`,
+    //       },
+    //       done: ['created', 'downloaded'],
+    //     },
+    //     delta: {
+    //       file: {
+    //         ...body.delta,
+    //         path: `${paths.data}/snapshots/sample/v2.csv`,
+    //       },
+    //       done: ['created', 'downloaded'],
+    //     },
+    //     diff: {
+    //       lineCount: 1,
+    //       path: `${paths.data}/diffs/sample/v1-v2.csv`,
+    //       url: `${paths.url}/data/diffs/sample/v1-v2.csv`,
+    //     },
+    //   });
 
     const dataResponse = await fetch(apiJson.diff.url);
     const data = await dataResponse.text();

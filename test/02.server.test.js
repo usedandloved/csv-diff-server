@@ -23,18 +23,21 @@ const sample2 = {
 };
 
 describe('Server ', () => {
-  let app, db, insert, deleteAll;
+  let app, db, insert, deleteAllDiff, deleteAllFile;
 
   before(async function () {
     ({ app, db } = await getServer({
-      databaseOptions: { path: 'data/test.db' },
+      databaseOptions: { path: paths.database },
     }));
 
     insert = db.prepare(
       'INSERT INTO file ( path, dataset, revision, source) VALUES (@path,@dataset,@revision,@source)'
     );
-    deleteAll = db.prepare('DELETE FROM file');
-    await deleteAll.run();
+    deleteAllDiff = db.prepare('DELETE FROM diff');
+    deleteAllFile = db.prepare('DELETE FROM file');
+    // await new Promise((resolve) => setTimeout(resolve, 500));
+    await deleteAllDiff.run();
+    await deleteAllFile.run();
   });
 
   after(async () => {

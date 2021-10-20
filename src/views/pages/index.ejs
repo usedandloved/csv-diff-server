@@ -36,6 +36,29 @@
         </tbody>
       </table>
       <h3>Diffs</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>Base</th>
+            <th>Delta</th>
+            <th>Path</th>
+
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% diffs.forEach(function(diff) { %>
+          <tr>
+            <td><%= diff.id %></td>
+            <td><%= diff.base_file_id %></td>
+            <td><%= diff.delta_file_id %></td>
+            <td><%= diff.path %></td>
+            <td>TBC</td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
     </main>
 
     <footer><%- include('../partials/footer'); %></footer>

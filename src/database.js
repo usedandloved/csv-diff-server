@@ -46,10 +46,10 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       FOREIGN KEY (delta_file_id) 
         REFERENCES file(id)
     )`);
-    // stmt.run();
+    stmt.run();
   } catch (e) {
     // Table already created
-    console.error(e);
+    // console.error(e);
     shouldAddTableContent = false;
   }
 

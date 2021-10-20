@@ -51,13 +51,18 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   // index page
   app.get('/', async (req, res) => {
-    let files;
+    let files, diffs;
     try {
       files = (await File.GetAll()) || [];
     } catch (e) {
       console.error(e);
     }
-    res.render('pages/index.ejs', { files });
+    try {
+      diffs = (await Diff.GetAll()) || [];
+    } catch (e) {
+      console.error(e);
+    }
+    res.render('pages/index.ejs', { files, diffs });
   });
 
   // Insert here other API endpoints
@@ -131,7 +136,9 @@ const getServer = async ({ databaseOptions } = {}) => {
   // Start server
   try {
     server = app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
+      if ('test' !== process.env.APP_ENV) {
+        console.log(`Server running on port ${port}`);
+      }
     });
   } catch (e) {
     console.error(e);

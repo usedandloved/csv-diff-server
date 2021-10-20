@@ -8,6 +8,24 @@ const paths = {
   database: process.env.PATHS_DATABASE || `/app/data/default.db`,
 };
 
+const withUrls = (data) => {
+  const populate = (object) => {
+    if (object.path && !object.url) {
+      object.url = object.path.replace(paths.data, `${paths.url}/data`);
+    }
+  };
+
+  if (Array.isArray(data)) {
+    data.forEach((object) => {
+      populate(object);
+    });
+  } else {
+    populate(data);
+  }
+
+  return data;
+};
+
 const downloadFile = async (source, target, options = {}) => {
   await fs.ensureDir(path.dirname(target));
 
@@ -30,4 +48,4 @@ const downloadFile = async (source, target, options = {}) => {
   );
 };
 
-export { paths, downloadFile };
+export { paths, withUrls, downloadFile };

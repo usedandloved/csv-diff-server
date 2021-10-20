@@ -3,7 +3,7 @@ import { getDb } from './database.js';
 import { getFile } from './models/File.js';
 import { getDiff } from './models/Diff.js';
 import main from './main.js';
-import { paths } from './lib/fs.js';
+import { paths, withUrls } from './lib/fs.js';
 
 let server;
 const port = process.env.PORT || 3000;
@@ -62,7 +62,7 @@ const getServer = async ({ databaseOptions } = {}) => {
     } catch (e) {
       console.error(e);
     }
-    res.render('pages/index.ejs', { files, diffs });
+    res.render('pages/index.ejs', { files, diffs: withUrls(diffs) });
   });
 
   // Insert here other API endpoints

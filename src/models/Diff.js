@@ -2,18 +2,24 @@ const getDiff = async (db) => {
   // return { Create: '' };
 
   const insert = db.prepare(
-    `
+    ` 
     INSERT INTO diff 
-      (base_file_id, delta_file_id, path) 
+      (base_file_id, delta_file_id, path, flag_hash, format) 
     VALUES
-      (@base_file_id, @delta_file_id, @path)`
+      (@base_file_id, @delta_file_id, @path, @flag_hash, @format)`
   );
 
   // const get = db.prepare('SELECT * FROM diff WHERE id = (@id)');
 
-  // const getByDatasetRevision = db.prepare(
-  //   'SELECT * FROM file WHERE dataset = (@dataset) AND revision = (@revision)'
-  // );
+  const getByFileIdsHashFormat = db.prepare(
+    `
+    SELECT * FROM diff 
+    WHERE base_file_id = (@base_file_id) 
+    AND delta_file_id = (@delta_file_id)
+    AND flag_hash = (@flag_hash)
+    AND format = (@format)
+    `
+  );
 
   const getAll = db.prepare('SELECT * FROM diff');
 
@@ -43,9 +49,9 @@ const getDiff = async (db) => {
     //   // console.log(params);
     //   return getByDatasetRevision.get(params);
     // },
-    GetByFilesAndFlags: (params) => {
+    GetByFileIdsHashFormat: (params) => {
       // console.log(params);
-      return getByDatasetRevision.get(params);
+      return getByFileIdsHashFormat.get(params);
     },
     GetAll: () => {
       console.log('get all diffs');

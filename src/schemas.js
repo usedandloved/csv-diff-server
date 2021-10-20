@@ -34,6 +34,7 @@ const diffParamsSchema = {
         'primary-key': integersSchema,
         separator: { type: 'string', maxLength: 2 },
         time: { type: 'boolean' },
+        lazyquotes: { type: 'boolean' },
         format: {
           type: 'string',
           enum: [

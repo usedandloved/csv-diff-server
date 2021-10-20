@@ -72,7 +72,9 @@ export default async ({ base, delta, flagString, target }) => {
   return diffResult;
 };
 
-const processFlags = async (flags = {}) => {
+const processFlags = async (flags) => {
+  if (!flags) flags = {};
+
   const ordered = Object.keys(flags)
     .sort()
     .reduce((obj, key) => {
@@ -84,21 +86,22 @@ const processFlags = async (flags = {}) => {
     extensionArray = [];
   for (const [key, value] of Object.entries(ordered)) {
     // console.log(`${key}: ${value}`);
-    if (['time'].includes(key) && value) {
+    if (['lazyquotes', 'time'].includes(key) && value) {
       stringArray.push(`--${key}`);
     } else {
       stringArray.push(`--${key} ${value}`);
     }
   }
 
-  const { format, ...flagsWithoutFormat } = ordered;
+  let { format = 'diff', ...flagsWithoutFormat } = ordered;
+
+  const json = JSON.stringify(flagsWithoutFormat);
+  // console.log(json);
+  const hash = Object.keys(flagsWithoutFormat).length
+    ? crypto.createHash('md5').update(json).digest('hex')
+    : '';
 
   if (Object.keys(flagsWithoutFormat).length) {
-    const json = JSON.stringify(flagsWithoutFormat);
-    // console.log(json);
-    const hash = Object.keys(flagsWithoutFormat).length
-      ? crypto.createHash('md5').update(json).digest('hex')
-      : '';
     extensionArray.push(hash.substring(0, 8));
   }
 
@@ -113,11 +116,16 @@ const processFlags = async (flags = {}) => {
 
   // The extension is unique based on the format
   // And a unique hash is generated based on the other flags
-  extensionArray.push(extensions[flags.format || 'diff']);
+
+  extensionArray.push(extensions[format]);
+
+  console.log(format);
 
   return {
     flagString: stringArray.join(' '),
+    flagHash: hash,
     extension: extensionArray.join('.'),
+    format: format,
   };
 };
 

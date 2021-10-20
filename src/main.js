@@ -15,15 +15,12 @@ export default async (params, File, Diff) => {
     console.error('invalid params', validResult);
     return {};
   }
-  let diff, flagString, extension, base, delta;
-
-  // diff = await Diff.GetByFiles({
-  //   dataset,
-  //   revision,
-  // });
+  let diff, flagString, flagHash, format, extension, base, delta;
 
   try {
-    ({ flagString, extension } = await processFlags(params.flags));
+    ({ flagString, flagHash, format, extension } = await processFlags(
+      params.flags
+    ));
   } catch (e) {
     console.error(e);
   }
@@ -50,32 +47,47 @@ export default async (params, File, Diff) => {
   }
   target += `/${base.file.revision}-${delta.file.revision}.${extension}`;
 
-  const diffResult = await csvdiff({
-    base: base.file.path,
-    delta: delta.file.path,
-    flagString,
-    target,
-  });
+  const diffUniqueProps = {
+    base_file_id: base.file.id,
+    delta_file_id: delta.file.id,
+    flag_hash: flagHash,
+    format,
+  };
 
-  // console.log(diffResult);
+  diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
 
-  try {
-    await Diff.Create({
-      base_file_id: base.file.id,
-      delta_file_id: delta.file.id,
-      ...diffResult,
+  if (!diff) {
+    const diffResult = await csvdiff({
+      base: base.file.path,
+      delta: delta.file.path,
+      flagString,
+      target,
     });
-  } catch (e) {
-    console.error(e);
+
+    // console.log(diffResult);
+
+    try {
+      await Diff.Create({
+        base_file_id: base.file.id,
+        delta_file_id: delta.file.id,
+        ...diffResult,
+        flag_hash: flagHash,
+        format,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+
+    try {
+      diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return {
     base,
     delta,
-    diff: {
-      lineCount: diffResult.lineCount,
-      path: diffResult.path,
-      url: diffResult.path.replace(paths.data, `${paths.url}/data`),
-    },
+    diff,
   };
 };

@@ -18,6 +18,8 @@ services:
     tty: true
     stdin_open: true
     # - - - - - - -
+    environment:
+      - APP_ENV=development
 
 volumes:
   csv_diff_server_node_modules:

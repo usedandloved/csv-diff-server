@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 
-import { downloadFile } from './lib/fs.js';
+import { downloadFile, paths } from './lib/fs.js';
 
 const processSnapshot = async (File, { dataset, source, revision }) => {
   let file;
@@ -28,6 +28,8 @@ const processSnapshot = async (File, { dataset, source, revision }) => {
         revision,
       });
     } catch (e) {
+      console.error(e);
+
       throw e;
     }
     done.push('created');
@@ -41,24 +43,24 @@ const processSnapshot = async (File, { dataset, source, revision }) => {
   // file.path is not set. Or file.path is not on the file system
   if (!file.path || !(await fs.pathExists(file.path))) {
     // Download the source to local
+
+    const target = `${paths.data}/snapshots/${dataset}/${revision}.csv`;
+
     try {
-      file.path = await downloadFile(
-        source,
-        `/app/data/snapshots/${dataset}/${revision}.csv`
-      );
+      file.path = await downloadFile(source, target);
     } catch (e) {
+      console.error(e);
       throw e;
     }
 
     try {
       await File.UpdateByDatasetRevision(file);
     } catch (e) {
+      console.error(e);
       throw e;
     }
     done.push('downloaded');
   }
-
-  // console.log({ file });
 
   // TODO: mode stuff here
 

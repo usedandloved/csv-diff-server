@@ -1,10 +1,18 @@
 import { exec } from 'child_process';
 import crypto from 'crypto';
 import path from 'path';
+import fs from 'fs-extra';
 
 export default async ({ base, delta, flagString, target }) => {
   let diffResult;
   try {
+    // Check the 2 files exist
+    const filesExist = await Promise.all([
+      fs.pathExists(base),
+      fs.pathExists(delta),
+    ]);
+    if (filesExist.includes(false)) throw 'base or delta files not found';
+
     diffResult = await new Promise(function (resolve, reject) {
       let stderr = '',
         lineCount = 0,
@@ -19,6 +27,8 @@ export default async ({ base, delta, flagString, target }) => {
       // Copy the first line
       // Then run csvdiff and pipe output to target file.
       // echo "$(head -n1 ${original}),UAL_DIFF_STATE" > ${target}
+
+      // console.log(`${base} ${delta} ${flagString}`);
 
       const script = exec(
         ` mkdir -p ${path.dirname(target)}
@@ -62,7 +72,7 @@ export default async ({ base, delta, flagString, target }) => {
   return diffResult;
 };
 
-const processFlags = async (flags) => {
+const processFlags = async (flags = {}) => {
   const ordered = Object.keys(flags)
     .sort()
     .reduce((obj, key) => {

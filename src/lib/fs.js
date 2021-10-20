@@ -24,7 +24,7 @@ const downloadFile = async (source, target, options = {}) => {
         } else {
           res.body.pipe(dest);
         }
-        res.body.on('end', resolve(target));
+        res.body.on('end', () => resolve(target));
         dest.on('error', (e) => reject(e));
       })
   );

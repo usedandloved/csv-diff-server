@@ -22,7 +22,7 @@ async function exitHandler(options, exitCode) {
 process.on('SIGINT', exitHandler.bind(null, { exit: true }));
 process.on('SIGUSR1', exitHandler.bind(null, { exit: true }));
 process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
-process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
+// process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
 
 const getServer = async ({ databaseOptions } = {}) => {
   let db;
@@ -124,7 +124,7 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   app.use('/data', express.static(paths.data));
 
-  if ('test' === process.env.APP_ENV) {
+  if (['development', 'test'].includes(process.env.APP_ENV)) {
     app.use('/test', express.static('/app/test/public'));
   }
 

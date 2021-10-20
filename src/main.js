@@ -15,20 +15,34 @@ export default async (params, File, Diff) => {
     console.error('invalid params', validResult);
     return {};
   }
-  let diff, flags;
+  let diff, flagString, extension, base, delta;
 
   // diff = await Diff.GetByFiles({
   //   dataset,
   //   revision,
   // });
 
-  // const flags
+  try {
+    ({ flagString, extension } = await processFlags(params.flags));
+  } catch (e) {
+    console.error(e);
+  }
 
-  const { flagString, extension } = await processFlags(params.flags);
+  // console.log(params);
   // console.log({ flagString, extension });
 
-  const base = await processSnapshot(File, params.base);
-  const delta = await processSnapshot(File, params.delta);
+  try {
+    base = await processSnapshot(File, params.base);
+  } catch (e) {
+    console.error(e);
+  }
+  try {
+    delta = await processSnapshot(File, params.delta);
+  } catch (e) {
+    console.error(e);
+  }
+
+  // console.log({ base, delta });
 
   let target = `${paths.data}/diffs/${base.file.dataset}`;
   if (base.file.dataset !== delta.file.dataset) {

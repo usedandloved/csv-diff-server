@@ -20,11 +20,12 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
 
 
     CREATE TABLE file (
-      id         INTEGER   PRIMARY KEY AUTOINCREMENT,
-      path       text      UNIQUE,
-      dataset    text,
-      source     text,
-      revision   text,
+      id             INTEGER   PRIMARY KEY AUTOINCREMENT,
+      path           text      UNIQUE,
+      dataset        text,
+      source         text,
+      revision       text,
+      created_at     integer(4) not null default (strftime('%s','now')),
       CONSTRAINT path_unique               UNIQUE (path)
       CONSTRAINT dataset_revision_unique   UNIQUE (dataset,revision)
     )`);
@@ -35,12 +36,13 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     shouldAddTableContent = false;
   }
   try {
-    const stmt = db.prepare(` 
+    const stmt = db.prepare(`
     CREATE TABLE diff (
-      id             INTEGER   PRIMARY KEY AUTOINCREMENT,
-      path           text      UNIQUE,
-      base_file_id   INTEGER   NOT NULL,
-      delta_file_id  INTEGER   NOT NULL,
+      id             INTEGER    PRIMARY KEY AUTOINCREMENT,
+      path           text       UNIQUE,
+      base_file_id   INTEGER    NOT NULL,
+      delta_file_id  INTEGER    NOT NULL,
+      created_at     integer(4) not null default (strftime('%s','now')),
       FOREIGN KEY (base_file_id) 
         REFERENCES file(id),
       FOREIGN KEY (delta_file_id) 

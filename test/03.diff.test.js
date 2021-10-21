@@ -180,7 +180,7 @@ describe.only('Server diff 2 ', () => {
         time: true,
       },
       postProcess: {
-        batchSize: 1,
+        batchSize: 10,
       },
     };
     // One liner to make sure file is being served.

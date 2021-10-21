@@ -34,7 +34,8 @@ const downloadFile = async (source, target, options = {}) => {
       new Promise(async (resolve, reject) => {
         const dest = fs.createWriteStream(target);
 
-        // if (options.fileHeaders) dest.write(options.fileHeaders.join(',') + '\n');
+        if (options.fileHeaders)
+          dest.write(options.fileHeaders.join(',') + '\n');
         // console.log(res.headers.raw());
 
         if ('application/gzip' === res.headers.get('content-type')) {

@@ -4,9 +4,15 @@ const getDiff = async (db) => {
   const insert = db.prepare(
     ` 
     INSERT INTO diff 
-      (base_file_id, delta_file_id, path, flag_hash, format, line_count) 
+      ( baseFileId, deltaFileId, path,
+        flagHash, format, lineCount, time,
+        additions, modifications, deletions
+      ) 
     VALUES
-      (@base_file_id, @delta_file_id, @path, @flag_hash, @format, @line_count)`
+      ( @baseFileId, @deltaFileId, @path,
+        @flagHash, @format, @lineCount, @time, 
+        @additions, @modifications, @deletions
+      )`
   );
 
   // const get = db.prepare('SELECT * FROM diff WHERE id = (@id)');
@@ -14,9 +20,9 @@ const getDiff = async (db) => {
   const getByFileIdsHashFormat = db.prepare(
     `
     SELECT * FROM diff 
-    WHERE base_file_id = (@base_file_id) 
-    AND delta_file_id = (@delta_file_id)
-    AND flag_hash = (@flag_hash)
+    WHERE baseFileId = (@baseFileId) 
+    AND deltaFileId = (@deltaFileId)
+    AND flagHash = (@flagHash)
     AND format = (@format)
     `
   );

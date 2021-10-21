@@ -1,11 +1,13 @@
 import { Validator } from '@cfworker/json-schema';
+import fs from 'fs-extra';
 
 import { processSnapshot } from './snapshot.js';
 import { diffParamsSchema } from './schemas.js';
 
-import { paths } from './lib/fs.js';
+import { paths, withUrls } from './lib/fs.js';
 import csvdiff, { processFlags } from './lib/csvdiff.js';
 import { postProcess } from './lib/postProcess.js';
+import { objectHash } from './lib/utils.js';
 
 const validator = new Validator(diffParamsSchema);
 
@@ -16,12 +18,11 @@ export default async (params, File, Diff) => {
     console.error('invalid params', validResult);
     return {};
   }
-  let diff, flagString, flagHash, format, extension, base, delta;
+  let diff, flagString, flagHash, flagHashShort, format, extension, base, delta;
 
   try {
-    ({ flagString, flagHash, format, extension } = await processFlags(
-      params.flags
-    ));
+    ({ flagString, flagHash, flagHashShort, format, extension } =
+      await processFlags(params.flags));
   } catch (e) {
     console.error(e);
   }
@@ -30,50 +31,53 @@ export default async (params, File, Diff) => {
   // console.log({ flagString, extension });
 
   try {
-    base = await processSnapshot(File, params.base);
+    base = await processSnapshot(File, params.base, params.preProcess);
   } catch (e) {
     console.error(e);
   }
   try {
-    delta = await processSnapshot(File, params.delta);
+    delta = await processSnapshot(File, params.delta, params.preProcess);
   } catch (e) {
     console.error(e);
   }
 
   // console.log({ base, delta });
 
-  let target = `${paths.data}/diffs/${base.file.dataset}`;
+  let diffPath = `${paths.data}/${base.file.dataset}`;
   if (base.file.dataset !== delta.file.dataset) {
-    target += `-${delta.file.dataset}`;
+    diffPath += `-${delta.file.dataset}`;
   }
-  target += `/${base.file.revision}-${delta.file.revision}.${extension}`;
+  diffPath += `/${base.file.revision}-${delta.file.revision}`;
+  if (flagHashShort) {
+    diffPath += `-${flagHashShort}`;
+  }
+  const diffTarget = `${diffPath}/csvdiff.${extension}`;
 
   const diffUniqueProps = {
-    base_file_id: base.file.id,
-    delta_file_id: delta.file.id,
-    flag_hash: flagHash,
+    baseFileId: base.file.id,
+    deltaFileId: delta.file.id,
+    flagHash,
     format,
   };
 
   diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
 
-  if (!diff) {
+  if (!diff || !(await fs.pathExists(diff.path))) {
     const diffResult = await csvdiff({
       base: base.file.path,
       delta: delta.file.path,
       flagString,
-      target,
+      target: diffTarget,
     });
 
-    console.log(diffResult);
+    // console.log(diffResult);
 
     try {
       await Diff.Create({
-        base_file_id: base.file.id,
-        delta_file_id: delta.file.id,
+        baseFileId: base.file.id,
+        deltaFileId: delta.file.id,
         ...diffResult,
-        flag_hash: flagHash,
-        line_count: diffResult.lineCount,
+        flagHash,
         format,
       });
     } catch (e) {
@@ -87,13 +91,31 @@ export default async (params, File, Diff) => {
     }
   }
 
-  if ('rowmark' === format && params.postProcess) {
-    postProcess(diff, params.postProcess);
+  // let target = `${paths.data}/${base.file.dataset}`;
+  // if (base.file.dataset !== delta.file.dataset) {
+  //   target += `-${delta.file.dataset}`;
+  // }
+  // target += `/${base.file.revision}-${delta.file.revision}`;
+  // if (flagHashShort) {
+  //   target += `-${flagHashShort}`;
+  // }
+  // target += `/diff.${extension}`;
+
+  if (params.postProcess) {
+    let target = {
+      dir: `${diffPath}/dist`,
+      extension,
+    };
+
+    if (Object.keys(params.postProcess).length) {
+      target.dir += `-${objectHash(params.postProcess).substring(0, 6)}`;
+    }
+    postProcess(diff, params.postProcess, target);
   }
 
   return {
     base,
     delta,
-    diff,
+    diff: withUrls(diff),
   };
 };

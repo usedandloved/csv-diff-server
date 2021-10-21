@@ -11,10 +11,13 @@ const processRow = async (row, transformPresets) => {
   return row;
 };
 
-const postProcess = async (diff, options) => {
-  console.log({ diff, options });
+const postProcess = async (diff, options, target) => {
+  // console.log({ diff, options, target });
 
-  const { line_count: lineCount } = diff;
+  const { lineCount: lineCount } = diff;
+
+  const transformPresets = {},
+    validateFilters = {};
 
   let { writerHeaders } = options;
   const { batchSize = 500 } = options;
@@ -24,13 +27,53 @@ const postProcess = async (diff, options) => {
   // logger.info({ writerHeaders, validateFilters });
 
   let csvParseResult,
-    validRows = {},
+    validRows = { total: 0 },
     writers = {},
     writePromises = [],
+    createWriteStreamPromises,
     result = {},
     onePercent = Math.round(lineCount / 100);
 
+  // TODO: based on the options, make a unique hash
+
   //   return;
+
+  const initWriters = async (writerHeaders) => {
+    const addedTarget = `${target.dir}/ADDED-0-${target.extension}`;
+    const modifiedTarget = `${target.dir}/MODIFIED-0-${target.extension}`;
+    const deletedTarget = `${target.dir}/DELETED-0-${target.extension}`;
+
+    await Promise.all([
+      fs.ensureFile(addedTarget),
+      fs.ensureFile(modifiedTarget),
+      fs.ensureFile(deletedTarget),
+    ]);
+    writers = {
+      ADDED: [
+        csvWriter({
+          headers: writerHeaders,
+        }),
+      ],
+      MODIFIED: [
+        csvWriter({
+          headers: writerHeaders,
+        }),
+      ],
+      DELETED: [
+        csvWriter({
+          headers: writerHeaders,
+        }),
+      ],
+    };
+
+    createWriteStreamPromises = Promise.all([
+      writers.ADDED[0].pipe(await fs.createWriteStream(addedTarget)),
+      writers.MODIFIED[0].pipe(await fs.createWriteStream(modifiedTarget)),
+      writers.DELETED[0].pipe(await fs.createWriteStream(deletedTarget)),
+    ]);
+
+    return writers;
+  };
 
   try {
     csvParseResult = await new Promise((resolve, reject) => {
@@ -47,6 +90,10 @@ const postProcess = async (diff, options) => {
                 // TODO: add a filter for writerHeaders
                 // Otherwise, dist csv could have many un-used headers.
                 if (!writerHeaders) writerHeaders = Object.values(headers);
+
+                // console.log({ headers });
+
+                initWriters(writerHeaders);
 
                 return headers;
               },
@@ -70,72 +117,90 @@ const postProcess = async (diff, options) => {
           //   options
           // );
 
+          console.log('start');
+
           if (!processedRow) return;
 
-          const diffState = row?.UAL_DIFF_STATE || 'ADDED';
+          const diffState = row?.CSVDIFF_STATE || 'ADDED';
 
-          // console.log(diffState);
+          if ('ADDED' === diffState) {
+            console.log(processedRow);
+          }
 
           if (undefined === validRows[diffState]) validRows[diffState] = 0;
-          if (!writers[diffState]) writers[diffState] = [];
-          if (!result[diffState]) result[diffState] = [];
 
           const thisValidRows = validRows[diffState]++;
+          validRows.total++;
 
-          // if (thisValidRows % 1000 === 0) {
-          //   console.log({ thisValidRows });
-          // }
-          if (thisValidRows % onePercent === 0) {
-            // console.log({ thisValidRows });
-            const percent = thisValidRows / onePercent;
-            // console.log({ percent });
-            updatePercentage(percent);
+          await createWriteStreamPromises;
+
+          if (thisValidRows % batchSize === 0 && thisValidRows > 0) {
+            console.log('in conditional');
+            const thisTarget = `${target.dir}/${diffState}-${thisValidRows}-${target.extension}`;
+            // Important to keep the incremental here
+            // towards start of the function
+
+            await fs.ensureFile(thisTarget);
+
+            const newWriter = csvWriter({
+              headers: writerHeaders,
+            });
+
+            await newWriter.pipe(await fs.createWriteStream(thisTarget));
+
+            // setTimeout(
+            //   (writer) => {
+            //     console.log('doing end');
+            //     writer.end();
+            //   },
+            //   3000,
+            //   writers[diffState].slice(-1)[0]
+            // );
+
+            writers[diffState].push(newWriter);
           }
 
-          if (thisValidRows % batchSize === 0) {
-            const relativePath = `/${csvId}/${version}/${diffState}/dist-${thisValidRows}.csv`;
-            const absolutePath = `${distPath}${relativePath}`;
-
-            result[diffState].push(relativePath);
-
-            if (writers[diffState].length) {
-              setTimeout(
-                function (writer) {
-                  console.log('doing end');
-                  writer.end();
-                },
-                3000,
-                writers[diffState][writers[diffState].length - 1]
-              );
-            }
-
-            writers[diffState].push(
-              csvWriter({
-                headers: writerHeaders,
-              })
-            );
-
-            await fs.ensureFile(absolutePath);
-
-            await writers[diffState][writers[diffState].length - 1].pipe(
-              fs.createWriteStream(absolutePath)
-            );
+          if ('ADDED' === diffState) {
+            console.log('writing');
           }
-          // console.log({ processedRow });
+
+          const promise = await writers[diffState][
+            writers[diffState].length - 1
+          ].write(processedRow);
+
+          console.log(promise);
 
           writePromises.push(
-            await writers[diffState][writers[diffState].length - 1].write(
+            writers[diffState][writers[diffState].length - 1].write(
               processedRow
             )
           );
+
+          // if (validRows[diffState] % 1000 === 0) {
+          //   console.log({ validRows[diffState] });
+          // }
+          // if (validRows.total % onePercent === 0) {
+          //   // console.log({ validRows[diffState] });
+          //   const percent = validRows[diffState] / onePercent;
+          //   // console.log({ percent });
+          //   updatePercentage(percent);
+          // }
+          return;
+
+          if (!result[diffState]) result[diffState] = [];
         })
         .on('end', async () => {
+          // Because end is called before writePromises.push is run.
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          await Promise.all(writePromises);
           await Promise.all([
-            ...writePromises,
             writers.added?.[writers.added.length - 1]?.end(),
             writers.modified?.[writers.modified.length - 1]?.end(),
             writers.deleted?.[writers.deleted.length - 1]?.end(),
           ]);
+
+          console.log('all promises are resolved');
 
           return resolve({
             processed: true,
@@ -144,7 +209,7 @@ const postProcess = async (diff, options) => {
     });
   } catch (error) {
     // Handle rejection here
-    // console.log(error);
+    console.error(error);
     throw error;
   }
 

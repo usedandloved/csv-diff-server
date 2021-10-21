@@ -24,6 +24,17 @@ const diffParamsSchema = {
   properties: {
     base: snapshotSchema,
     delta: snapshotSchema,
+    preProcess: {
+      type: 'object',
+      properties: {
+        headers: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+        },
+      },
+    },
     flags: {
       type: 'object',
       additionalProperties: false,

@@ -30,7 +30,7 @@
             <td><%= file.dataset %></td>
             <td><%= file.revision %></td>
             <td><%= file.source %></td>
-            <td><%= file.created_at %></td>
+            <td><%= file.createdAt %></td>
           </tr>
           <% }); %>
         </tbody>
@@ -51,13 +51,13 @@
           <% diffs.forEach(function(diff) { %>
           <tr>
             <td><%= diff.id %></td>
-            <td><%= diff.base_file_id %></td>
-            <td><%= diff.delta_file_id %></td>
+            <td><%= diff.baseFileId %></td>
+            <td><%= diff.deltaFileId %></td>
             <td><%= diff.path %></td>
             <td>
               <a href="<%= diff.url %>"><%= diff.url %></a>
             </td>
-            <td><%= diff.created_at %></td>
+            <td><%= diff.createdAt %></td>
           </tr>
           <% }); %>
         </tbody>

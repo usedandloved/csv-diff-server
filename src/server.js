@@ -62,7 +62,7 @@ const getServer = async ({ databaseOptions } = {}) => {
     } catch (e) {
       console.error(e);
     }
-    res.render('pages/index.ejs', { files, diffs: withUrls(diffs) });
+    res.render('pages/index.ejs', { files, diffs });
   });
 
   // Insert here other API endpoints

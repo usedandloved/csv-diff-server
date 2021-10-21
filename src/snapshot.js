@@ -2,9 +2,15 @@ import fs from 'fs-extra';
 
 import { downloadFile, paths } from './lib/fs.js';
 
-const processSnapshot = async (File, { dataset, source, revision }) => {
+const processSnapshot = async (
+  File,
+  { dataset, source, revision },
+  { headers } = {}
+) => {
   let file;
   const done = [];
+
+  // console.log({ headers });
 
   if (!dataset) dataset = 'default';
 
@@ -44,10 +50,10 @@ const processSnapshot = async (File, { dataset, source, revision }) => {
   if (!file.path || !(await fs.pathExists(file.path))) {
     // Download the source to local
 
-    const target = `${paths.data}/snapshots/${dataset}/${revision}.csv`;
+    const target = `${paths.data}/${dataset}/snapshots/${revision}.csv`;
 
     try {
-      file.path = await downloadFile(source, target);
+      file.path = await downloadFile(source, target, { fileHeaders: headers });
     } catch (e) {
       console.error(e);
       throw e;

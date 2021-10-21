@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs-extra';
 
+import { objectHash } from './utils.js';
+
 export default async ({ base, delta, flagString, target }) => {
   let diffResult;
   try {
@@ -26,14 +28,16 @@ export default async ({ base, delta, flagString, target }) => {
 
       // Copy the first line
       // Then run csvdiff and pipe output to target file.
-      // echo "$(head -n1 ${original}),UAL_DIFF_STATE" > ${target}
+      // echo "$(head -n1 ${original}),CSVDIFF_STATE" > ${target}
 
       // console.log(`${base} ${delta} ${flagString}`);
 
       const script = exec(
-        ` mkdir -p ${path.dirname(target)}
-          csvdiff ${base} ${delta} ${flagString} > ${target} 
-          wc -l < ${target}`
+        ` 
+        echo "$(head -n1 ${base}),CSVDIFF_STATE" > ${target}
+        mkdir -p ${path.dirname(target)}
+        csvdiff ${base} ${delta} ${flagString} >> ${target} 
+        wc -l < ${target}`
       );
 
       script.stdout.on('data', (data) => {
@@ -98,12 +102,8 @@ const processFlags = async (flags) => {
   const json = JSON.stringify(flagsWithoutFormat);
   // console.log(json);
   const hash = Object.keys(flagsWithoutFormat).length
-    ? crypto.createHash('md5').update(json).digest('hex')
+    ? objectHash(flagsWithoutFormat)
     : '';
-
-  if (Object.keys(flagsWithoutFormat).length) {
-    extensionArray.push(hash.substring(0, 8));
-  }
 
   const extensions = {
     diff: 'diff.txt',
@@ -115,16 +115,14 @@ const processFlags = async (flags) => {
   };
 
   // The extension is unique based on the format
+
   // And a unique hash is generated based on the other flags
-
-  extensionArray.push(extensions[format]);
-
-  console.log(format);
 
   return {
     flagString: stringArray.join(' '),
     flagHash: hash,
-    extension: extensionArray.join('.'),
+    flagHashShort: hash.substring(0, 6),
+    extension: extensions[format],
     format: format,
   };
 };

@@ -110,7 +110,11 @@ export default async (params, File, Diff) => {
     if (Object.keys(params.postProcess).length) {
       target.dir += `-${objectHash(params.postProcess).substring(0, 6)}`;
     }
-    postProcess(diff, params.postProcess, target);
+    try {
+      postProcess(diff, params.postProcess, target);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return {

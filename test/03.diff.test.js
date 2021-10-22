@@ -44,21 +44,23 @@ const sample4 = {
 };
 
 describe('Server diff 2 ', () => {
-  let app, db, deleteAllDiff, deleteAllFile;
+  let app, db, deleteAllDist, deleteAllDiff, deleteAllFile;
 
   before(async () => {
     try {
       ({ app, db } = await getServer({
         databaseOptions: { target: paths.database },
       }));
+      deleteAllDist = db.prepare('DELETE FROM dist');
       deleteAllDiff = db.prepare('DELETE FROM diff');
       deleteAllFile = db.prepare('DELETE FROM file');
       // await new Promise((resolve) => setTimeout(resolve, 500));
+      await deleteAllDist.run();
       await deleteAllDiff.run();
       await deleteAllFile.run();
     } catch (e) {
       console.error(e);
-      return reject();
+      throw e;
     }
   });
 
@@ -92,6 +94,9 @@ describe('Server diff 2 ', () => {
         // separator: ',',
         time: true,
       },
+      postProcess: {
+        batchSize: 1,
+      },
     };
     // One liner to make sure file is being served.
 
@@ -113,12 +118,30 @@ describe('Server diff 2 ', () => {
     // console.log(apiJson);
 
     expect(apiJson)
-      .excludingEvery(['id', 'baseFileId', 'deltaFileId', 'createdAt', 'time'])
+      .excludingEvery([
+        'id',
+        'baseFileId',
+        'deltaFileId',
+        'createdAt',
+        'time',
+        'diffId',
+      ])
       .to.deep.equal(postDiffTestResponse({ body }));
 
     const dataResponse = await fetch(apiJson.diff.url);
     const data = await dataResponse.text();
     expect(data).to.equal('t1,t2,CSVDIFF_STATE\nv1,v2e,MODIFIED\n');
+
+    // Test the dist files
+    for (const dist of apiJson.dists) {
+      const distResponse = await fetch(dist.url);
+      const distText = await distResponse.text();
+      if ('modified' === dist.diffState) {
+        // console.log(dist);
+        // console.log('dist matches');
+        expect(distText).to.equal('t1,t2,CSVDIFF_STATE\nv1,v2e,MODIFIED');
+      }
+    }
   }).timeout(15000);
 
   it('post : diff small', async () => {
@@ -184,7 +207,14 @@ describe('Server diff 2 ', () => {
     // console.log(apiJson.dist);
 
     expect(apiJson)
-      .excludingEvery(['id', 'baseFileId', 'deltaFileId', 'createdAt', 'time'])
+      .excludingEvery([
+        'id',
+        'baseFileId',
+        'deltaFileId',
+        'createdAt',
+        'time',
+        'diffId',
+      ])
       .to.deep.equal(postDiffSmallResponse({ body }));
 
     const dataResponse = await fetch(apiJson.diff.url);
@@ -196,7 +226,7 @@ describe('Server diff 2 ', () => {
     expect(data.split('\n')).to.deep.equalInAnyOrder(`${expected}`.split('\n'));
 
     // Test the dist files
-    for (const dist of apiJson.dist) {
+    for (const dist of apiJson.dists) {
       const distResponse = await fetch(dist.url);
       const distText = await distResponse.text();
       for (const line of distText.split('\n')) {

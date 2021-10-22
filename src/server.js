@@ -2,6 +2,7 @@ import express from 'express';
 import { getDb } from './database.js';
 import { getFile } from './models/File.js';
 import { getDiff } from './models/Diff.js';
+import { getDist } from './models/Dist.js';
 import main from './main.js';
 import { paths, withUrls } from './lib/fs.js';
 
@@ -35,6 +36,7 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   const File = await getFile(db);
   const Diff = await getDiff(db);
+  const Dist = await getDist(db);
 
   const app = express();
 
@@ -51,18 +53,23 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   // index page
   app.get('/', async (req, res) => {
-    let files, diffs;
+    let files, diffs, dists;
     try {
       files = (await File.GetAll()) || [];
     } catch (e) {
       console.error(e);
     }
     try {
-      diffs = (await Diff.GetAll()) || [];
+      diffs = withUrls(await Diff.GetAll()) || [];
     } catch (e) {
       console.error(e);
     }
-    res.render('pages/index.ejs', { files, diffs });
+    try {
+      dists = withUrls(await Dist.GetAll()) || [];
+    } catch (e) {
+      console.error(e);
+    }
+    res.render('pages/index.ejs', { files, diffs, dists });
   });
 
   // Insert here other API endpoints
@@ -115,7 +122,7 @@ const getServer = async ({ databaseOptions } = {}) => {
   app.post('/api/diff', async (req, res, next) => {
     let diff;
     try {
-      diff = await main(req.body, File, Diff);
+      diff = await main(req.body, File, Diff, Dist);
     } catch (e) {
       console.log(e);
     }

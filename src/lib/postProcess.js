@@ -16,24 +16,16 @@ const postProcess = async (diff, options, target) => {
 
   const { lineCount: lineCount } = diff,
     { batchSize = 500 } = options,
-    csvStreams = {
-      ADDED: [],
-      MODIFIED: [],
-      DELETED: [],
-    },
-    writeStreams = {
-      ADDED: [],
-      MODIFIED: [],
-      DELETED: [],
-    },
+    csvStreams = {},
+    possibleDiffStates = ['added', 'modified', 'deleted'],
+    writeStreams = {},
     transformPresets = {},
     validateFilters = {};
 
   let csvParseResult,
     { writerHeaders } = options,
-    validRows = { ADDED: 0, MODIFIED: 0, DELETED: 0, total: 0 },
+    validRows = { total: 0 },
     writePromises = [],
-    result = {},
     onePercent = Math.round(lineCount / 100);
 
   const makeCsvStream = async (diffState, i) => {
@@ -41,6 +33,10 @@ const postProcess = async (diff, options, target) => {
 
     await fs.ensureFile(thisTarget);
 
+    // Use a tempCsvStream so that we don't add it to the array
+    // until it has had the writeStream piped onto it
+    // Because, later we expect the last in the array to be ready
+    // for writing.
     const tempCsvStream = format({ headers: true });
 
     writeStreams[diffState][i] = fs.createWriteStream(thisTarget);
@@ -49,18 +45,35 @@ const postProcess = async (diff, options, target) => {
       .pipe(writeStreams[diffState][i])
       .on('end', () => writeStreams[diffState][i].end());
 
-    return (csvStreams[diffState][i] = tempCsvStream);
+    csvStreams[diffState][i] = tempCsvStream;
+
+    return;
   };
 
-  try {
-    await Promise.all([
-      makeCsvStream('ADDED', 0),
-      makeCsvStream('MODIFIED', 0),
-      makeCsvStream('DELETED', 0),
-    ]);
-  } catch (e) {
-    console.log(e);
+  const makeCsvStreamPromises = [];
+  for (const diffState of possibleDiffStates) {
+    // Init empty arrays and counters for possibleDiffStates
+    csvStreams[diffState] = [];
+    writeStreams[diffState] = [];
+    validRows[diffState] = 0;
+    try {
+      // Make csvStreams for possibleDiffStates
+      makeCsvStreamPromises.push(makeCsvStream(diffState, 0));
+    } catch (e) {
+      console.log(e);
+    }
   }
+  await Promise.all(makeCsvStreamPromises);
+
+  // try {
+  //   await Promise.all([
+  //     makeCsvStream('added'', 0),
+  //     makeCsvStream('modified', 0),
+  //     makeCsvStream('deleted', 0),
+  //   ]);
+  // } catch (e) {
+  //   console.log(e);
+  // }
 
   try {
     csvParseResult = await new Promise((resolve, reject) => {
@@ -103,7 +116,9 @@ const postProcess = async (diff, options, target) => {
 
           if (!processedRow) return;
 
-          const diffState = row?.CSVDIFF_STATE || 'ADDED';
+          // console.log({ processedRow });
+
+          const diffState = row?.CSVDIFF_STATE.toLowerCase() || 'added';
 
           const thisValidRows = validRows[diffState]++;
           validRows.total++;
@@ -122,17 +137,10 @@ const postProcess = async (diff, options, target) => {
             oldCsvStream.end();
           }
 
-          writePromises.push(
-            new Promise(async (res, rej) => {
-              try {
-                await csvStreams[diffState][index].write(processedRow);
-              } catch (e) {
-                console.error(e);
-                rej(e);
-              }
-              res();
-            })
-          );
+          // console.log('writing');
+          // console.log({ diffState, index, processedRow });
+
+          writePromises.push(csvStreams[diffState][index].write(processedRow));
 
           // if (validRows[diffState] % 1000 === 0) {
           //   console.log({ validRows[diffState] });
@@ -148,26 +156,23 @@ const postProcess = async (diff, options, target) => {
         .on('end', async () => {
           await Promise.all(writePromises);
 
-          // console.log('all promises are resolved');
+          const result = [];
 
-          csvStreams.ADDED.slice(-1)[0].end();
-          csvStreams.MODIFIED.slice(-1)[0].end();
-          csvStreams.DELETED.slice(-1)[0].end();
+          for (const diffState of possibleDiffStates) {
+            // End the last stream
+            csvStreams[diffState].slice(-1)[0].end();
+            // If no valid rows for this diff state then return.
+            if (!validRows[diffState]) continue;
+            // Push the write streams to the result
+            result.push(
+              ...writeStreams[diffState].map((s) => ({
+                path: s.path,
+                diffState,
+              }))
+            );
+          }
 
-          return resolve([
-            ...writeStreams.ADDED.map((s) => ({
-              path: s.path,
-              diffState: 'added',
-            })),
-            ...writeStreams.MODIFIED.map((s) => ({
-              path: s.path,
-              diffState: 'modified',
-            })),
-            ...writeStreams.DELETED.map((s) => ({
-              path: s.path,
-              diffState: 'deleted',
-            })),
-          ]);
+          return resolve(result);
         });
     });
   } catch (error) {
@@ -175,9 +180,6 @@ const postProcess = async (diff, options, target) => {
     console.error(error);
     throw error;
   }
-
-  // console.log(writeStreams);
-  // console.log(csvParseResult);
 
   return csvParseResult;
 };

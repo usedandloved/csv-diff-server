@@ -25,6 +25,14 @@ const postDiffTestResponse = ({ body }) => ({
     modifications: 1,
     deletions: 0,
   },
+  dists: [
+    {
+      path: '/app/data/sample/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
+      diffState: 'modified',
+      postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
+      url: 'http://localhost:3001/data/sample/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
+    },
+  ],
 });
 const postDiffSmallResponse = ({ body }) => ({
   base: {
@@ -51,31 +59,36 @@ const postDiffSmallResponse = ({ body }) => ({
     deletions: 3,
     url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/csvdiff.rowmark.csv',
   },
-  dist: [
+  dists: [
     {
-      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/ADDED-0-rowmark.csv',
+      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/added-0-rowmark.csv',
       diffState: 'added',
-      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/ADDED-0-rowmark.csv',
+      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/added-0-rowmark.csv',
+      postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
-      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/MODIFIED-0-rowmark.csv',
+      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
       diffState: 'modified',
-      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/MODIFIED-0-rowmark.csv',
+      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
+      postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
-      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/DELETED-0-rowmark.csv',
+      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-0-rowmark.csv',
       diffState: 'deleted',
-      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/DELETED-0-rowmark.csv',
+      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-0-rowmark.csv',
+      postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
-      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/DELETED-1-rowmark.csv',
+      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-1-rowmark.csv',
       diffState: 'deleted',
-      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/DELETED-1-rowmark.csv',
+      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-1-rowmark.csv',
+      postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
-      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/DELETED-2-rowmark.csv',
+      path: '/app/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-2-rowmark.csv',
       diffState: 'deleted',
-      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/DELETED-2-rowmark.csv',
+      url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-2-rowmark.csv',
+      postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
   ],
 });

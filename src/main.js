@@ -11,7 +11,7 @@ import { objectHash } from './lib/utils.js';
 
 const validator = new Validator(diffParamsSchema);
 
-export default async (params, File, Diff) => {
+export default async (params, File, Diff, Dist) => {
   const validResult = validator.validate(params);
 
   if (!validResult.valid) {
@@ -101,29 +101,52 @@ export default async (params, File, Diff) => {
   // }
   // target += `/diff.${extension}`;
 
-  let dist;
-  if (params.postProcess) {
-    let target = {
-      dir: `${diffPath}/dist`,
-      extension,
-    };
+  let dists;
 
-    if (Object.keys(params.postProcess).length) {
-      target.dir += `-${objectHash(params.postProcess).substring(0, 6)}`;
-    }
-    try {
-      dist = await postProcess(diff, params.postProcess, target);
-    } catch (e) {
-      console.error(e);
+  if (params.postProcess) {
+    // console.log(diff);
+
+    const postProcessHash = `${objectHash(params.postProcess)}`;
+
+    dists = Dist.GetByDiffIdPostProcessHash({
+      diffId: diff.id,
+      postProcessHash,
+    });
+
+    // TODO, check all files exist
+    if (!dists) {
+      let target = {
+        dir: `${diffPath}/dist`,
+        extension,
+      };
+
+      if (Object.keys(params.postProcess).length) {
+        target.dir += `-${postProcessHash.substring(0, 6)}`;
+      }
+      try {
+        dists = await postProcess(diff, params.postProcess, target);
+      } catch (e) {
+        console.error(e);
+      }
+
+      dists = dists.map((obj) => ({
+        ...obj,
+        diffId: diff.id,
+        postProcessHash,
+      }));
+
+      Dist.CreateMany(dists);
     }
   }
 
-  // console.log(dist);
+  // console.log(withUrls(dists));
+
+  // console.log(dists);
 
   return {
     base,
     delta,
     diff: withUrls(diff),
-    dist: withUrls(dist),
+    dists: withUrls(dists),
   };
 };

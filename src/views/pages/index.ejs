@@ -62,6 +62,31 @@
           <% }); %>
         </tbody>
       </table>
+      <h3>Dists</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>Diff</th>
+            <th>Path</th>
+            <th>Url</th>
+            <th>Created at</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% dists.forEach(function(dist) { %>
+          <tr>
+            <td><%= dist.id %></td>
+            <td><%= dist.diffId %></td>
+            <td><%= dist.path %></td>
+            <td>
+              <a href="<%= dist.url %>"><%= dist.url %></a>
+            </td>
+            <td><%= dist.createdAt %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
     </main>
 
     <footer><%- include('../partials/footer'); %></footer>

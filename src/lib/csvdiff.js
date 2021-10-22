@@ -34,8 +34,8 @@ export default async ({ base, delta, flagString, target }) => {
 
       const script = exec(
         ` 
-        echo "$(head -n1 ${base}),CSVDIFF_STATE" > ${target}
         mkdir -p ${path.dirname(target)}
+        echo "$(head -n1 ${base}),CSVDIFF_STATE" > ${target} 
         csvdiff ${base} ${delta} ${flagString} >> ${target} 
         wc -l < ${target}`
       );

@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 const getDb = async ({ target = 'data/default.db' } = {}) => {
-  let db;
+  let db, tableNames;
 
   try {
     await fs.ensureDir(path.dirname(target));
@@ -14,11 +14,19 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     throw e;
   }
 
-  let shouldAddTableContent = true;
   try {
-    const stmt = db.prepare(`
+    const stmt = db.prepare(
+      `SELECT name FROM sqlite_master WHERE type='table';`
+    );
+    const tables = stmt.all();
+    tableNames = tables.map((table) => table.name);
+  } catch (e) {
+    console.error(e);
+  }
 
-
+  if (!tableNames.includes('file')) {
+    try {
+      const stmt = db.prepare(`
     CREATE TABLE file (
       id             INTEGER   PRIMARY KEY AUTOINCREMENT,
       path           text      UNIQUE,
@@ -29,14 +37,15 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       CONSTRAINT path_unique               UNIQUE (path)
       CONSTRAINT dataset_revision_unique   UNIQUE (dataset,revision)
     )`);
-    stmt.run();
-  } catch (e) {
-    // Table already created
-    // console.error(e);
-    shouldAddTableContent = false;
+      stmt.run();
+    } catch (e) {
+      console.error(e);
+    }
   }
-  try {
-    const stmt = db.prepare(` 
+
+  if (!tableNames.includes('diff')) {
+    try {
+      const stmt = db.prepare(` 
     CREATE TABLE diff (
       id            INTEGER    PRIMARY KEY AUTOINCREMENT,
       path          text       UNIQUE,
@@ -55,11 +64,29 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       FOREIGN KEY (deltaFileId) 
         REFERENCES file(id)
     )`);
-    stmt.run();
-  } catch (e) {
-    // Table already created
-    // console.error(e);
-    shouldAddTableContent = false;
+      stmt.run();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  if (!tableNames.includes('dist')) {
+    try {
+      const stmt = db.prepare(` 
+    CREATE TABLE dist (
+      id              INTEGER    PRIMARY KEY AUTOINCREMENT,
+      path            text       UNIQUE,
+      diffId          INTEGER    NOT NULL,
+      postProcessHash text       NOT NULL,
+      diffState       text       NOT NULL,
+      createdAt       integer(4) not null default (strftime('%s','now')), 
+      FOREIGN KEY (diffId) 
+        REFERENCES diff(id)
+    )`);
+      stmt.run();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // if (shouldAddTableContent) {

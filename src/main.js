@@ -104,8 +104,6 @@ export default async (params, File, Diff, Dist) => {
   let dists;
 
   if (params.postProcess) {
-    // console.log(diff);
-
     const postProcessHash = `${objectHash(params.postProcess)}`;
 
     dists = Dist.GetByDiffIdPostProcessHash({
@@ -113,14 +111,16 @@ export default async (params, File, Diff, Dist) => {
       postProcessHash,
     });
 
-    if (dists && (await isDistPathsIsMissing(dists))) {
+    // console.log(dists);
+
+    if (!dists.length && (await isDistPathsIsMissing(dists))) {
       console.error('a dist path is missing. Will re-do');
       Dist.DeleteMany(dists);
-      dists = undefined;
+      dists = [];
     }
 
-    if (!dists) {
-      console.log('will make dists');
+    if (!dists.length) {
+      // console.log('will make dists');
       let target = {
         dir: `${diffPath}/dist`,
         extension,

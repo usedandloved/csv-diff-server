@@ -22,12 +22,20 @@ const sample2 = {
 };
 
 describe('File model ', () => {
-  let db, File;
+  let db, File, deleteAllDist, deleteAllDiff, deleteAllFile;
 
   before(async () => {
     db = await getDb({ target: './data/test.db' });
+
     File = await getFile(db);
-    File.DeleteAll();
+
+    deleteAllDist = db.prepare('DELETE FROM dist');
+    deleteAllDiff = db.prepare('DELETE FROM diff');
+    deleteAllFile = db.prepare('DELETE FROM file');
+    // await new Promise((resolve) => setTimeout(resolve, 500));
+    await deleteAllDist.run();
+    await deleteAllDiff.run();
+    await deleteAllFile.run();
   });
 
   after(() => {
@@ -52,7 +60,7 @@ describe('File model ', () => {
   it('GetAll ', async () => {
     const actual = File.GetAll();
     expect(actual)
-      .excluding('id')
+      .excluding(['id', 'createdAt'])
       .to.deep.equal([{ ...sample1, revision: 'v3' }, sample2]);
   });
 
@@ -61,7 +69,7 @@ describe('File model ', () => {
       dataset: 'sample',
       revision: 'v2',
     });
-    expect(actual).excluding('id').to.deep.equal(sample2);
+    expect(actual).excluding(['id', 'createdAt']).to.deep.equal(sample2);
   });
 
   it('Delete ', async () => {

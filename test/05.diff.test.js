@@ -234,8 +234,7 @@ describe('Server diff 2 ', () => {
       }
     }
 
-    // Make a Dist model
-    // Read and write to Dist in database
+    // TODO:
     // Add some real world data
     // Test and implement jsonata
   }).timeout(15000);

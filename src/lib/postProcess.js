@@ -65,16 +65,6 @@ const postProcess = async (diff, options, target) => {
   }
   await Promise.all(makeCsvStreamPromises);
 
-  // try {
-  //   await Promise.all([
-  //     makeCsvStream('added'', 0),
-  //     makeCsvStream('modified', 0),
-  //     makeCsvStream('deleted', 0),
-  //   ]);
-  // } catch (e) {
-  //   console.log(e);
-  // }
-
   try {
     csvParseResult = await new Promise((resolve, reject) => {
       fs.createReadStream(diff.path)
@@ -161,8 +151,13 @@ const postProcess = async (diff, options, target) => {
           for (const diffState of possibleDiffStates) {
             // End the last stream
             csvStreams[diffState].slice(-1)[0].end();
-            // If no valid rows for this diff state then return.
-            if (!validRows[diffState]) continue;
+            // If no valid rows for this diff state then...
+            if (!validRows[diffState]) {
+              // Delete the empty file
+              fs.remove(writeStreams[diffState][0].path);
+              // And continue the loop.
+              continue;
+            }
             // Push the write streams to the result
             result.push(
               ...writeStreams[diffState].map((s) => ({

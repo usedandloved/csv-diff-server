@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import { processSnapshot } from './snapshot.js';
 import { diffParamsSchema } from './schemas.js';
 
-import { paths, withUrls } from './lib/fs.js';
+import { paths, withUrls, isDistPathsIsMissing } from './lib/fs.js';
 import csvdiff, { processFlags } from './lib/csvdiff.js';
 import { postProcess } from './lib/postProcess.js';
 import { objectHash } from './lib/utils.js';
@@ -113,8 +113,14 @@ export default async (params, File, Diff, Dist) => {
       postProcessHash,
     });
 
-    // TODO, check all files exist
+    if (dists && (await isDistPathsIsMissing(dists))) {
+      console.error('a dist path is missing. Will re-do');
+      Dist.DeleteMany(dists);
+      dists = undefined;
+    }
+
     if (!dists) {
+      console.log('will make dists');
       let target = {
         dir: `${diffPath}/dist`,
         extension,

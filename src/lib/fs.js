@@ -54,4 +54,12 @@ const downloadFile = async (source, target, options = {}) => {
   );
 };
 
-export { paths, withUrls, downloadFile };
+const isDistPathsIsMissing = async (dists) => {
+  const promises = [];
+  for (const dist of dists) {
+    promises.push(fs.pathExists(dist.path));
+  }
+  return (await Promise.all(promises)).includes(false);
+};
+
+export { paths, withUrls, downloadFile, isDistPathsIsMissing };

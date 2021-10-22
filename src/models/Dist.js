@@ -27,7 +27,11 @@ const getDist = async (db) => {
 
   const getAll = db.prepare('SELECT * FROM dist');
 
-  // const deleteOne = db.prepare('DELETE FROM file WHERE path = (@path)');
+  const deleteMany = db.transaction((dists) => {
+    for (const dist of dists) deleteOne.run({ id: dist.id });
+  });
+
+  const deleteOne = db.prepare('DELETE FROM dist WHERE id = (@id)');
 
   // const deleteAll = db.prepare('DELETE FROM file');
 
@@ -42,11 +46,15 @@ const getDist = async (db) => {
     },
     GetByDiffIdPostProcessHash: (params) => {
       // console.log(params);
-      return getByDiffIdPostProcessHash.get(params);
+      return getByDiffIdPostProcessHash.all(params);
     },
     GetAll: () => {
       console.log('get all dists');
       return getAll.all();
+    },
+    DeleteMany: (dists) => {
+      // console.log('creating dist', params);
+      return deleteMany(dists);
     },
     // Delete: (params) => {
     //   // console.log('deleting csv', params);

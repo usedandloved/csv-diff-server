@@ -1,0 +1,6 @@
+GlobalRank,TldRank,Domain,TLD,RefSubNets,RefIPs,IDN_Domain,IDN_TLD,PrevGlobalRank,PrevTldRank,PrevRefSubNets,PrevRefIPs,CSVDIFF_STATE
+1616,906,ccleaner.com,com,19831,32507,ccleaner.com,com,1614,903,19834,32463,DELETED
+24564,907,completely-newsite.com,com,19827,32902,completely-newsite.com,com,1621,909,19787,32822,ADDED
+69,1048,aol.com,com,97543,225532,aol.com,com,70,49,97328,224491,MODIFIED
+1615,905,proboards.com,com,19833,33110,proboards.com,com,1613,902,19835,33135,DELETED
+1617,907,doodle.com,com,19827,32902,doodle.com,com,1621,909,19787,32822,DELETED

@@ -29,15 +29,6 @@ const getDiff = async (db) => {
 
   const getAll = db.prepare('SELECT * FROM diff');
 
-  // const update = db.prepare(
-  //   'UPDATE file SET revision = (@revision) WHERE path = (@path)'
-  // );
-
-  // const updateByDatasetRevision = db.prepare(
-  //   `UPDATE file SET path = (@path)
-  //    WHERE dataset = (@dataset) AND revision = (@revision)`
-  // );
-
   // const deleteOne = db.prepare('DELETE FROM file WHERE path = (@path)');
 
   // const deleteAll = db.prepare('DELETE FROM file');
@@ -47,14 +38,6 @@ const getDiff = async (db) => {
       // console.log('creating diff', params);
       return insert.run(params);
     },
-    // GetOne: (params) => {
-    //   // console.log('get all csv');
-    //   return get.get(params);
-    // },
-    // GetByDatasetRevision: (params) => {
-    //   // console.log(params);
-    //   return getByDatasetRevision.get(params);
-    // },
     GetByFileIdsHashFormat: (params) => {
       // console.log(params);
       return getByFileIdsHashFormat.get(params);
@@ -63,14 +46,6 @@ const getDiff = async (db) => {
       console.log('get all diffs');
       return getAll.all();
     },
-    // Update: (params) => {
-    //   // console.log('creating csv', params);
-    //   return update.run(params);
-    // },
-    // UpdateByDatasetRevision: (params) => {
-    //   // console.log('creating csv', params);
-    //   return updateByDatasetRevision.run(params);
-    // },
     // Delete: (params) => {
     //   // console.log('deleting csv', params);
     //   return deleteOne.run(params);

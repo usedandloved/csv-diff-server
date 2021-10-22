@@ -1,11 +1,19 @@
 import chai from 'chai';
 import chaiExclude from 'chai-exclude';
+import deepEqualInAnyOrder from 'deep-equal-in-any-order';
 import fetch from 'node-fetch';
+import fs from 'fs-extra';
 
 import { getServer } from '../src/server.js';
 import { paths } from '../src/lib/fs.js';
 
+import {
+  postDiffTestResponse,
+  postDiffSmallResponse,
+} from './expected/index.js';
+
 chai.use(chaiExclude);
+chai.use(deepEqualInAnyOrder);
 const { expect } = chai;
 
 const sample1 = {
@@ -35,7 +43,7 @@ const sample4 = {
   path: null,
 };
 
-describe.only('Server diff 2 ', () => {
+describe('Server diff 2 ', () => {
   let app, db, deleteAllDiff, deleteAllFile;
 
   before(async () => {
@@ -62,7 +70,7 @@ describe.only('Server diff 2 ', () => {
     }
   });
 
-  xit('post : diff', async () => {
+  it('post : diff', async () => {
     // await deleteAll.run();
     const body = {
       base: {
@@ -83,9 +91,6 @@ describe.only('Server diff 2 ', () => {
         // 'primary-key': '1',
         // separator: ',',
         time: true,
-      },
-      postProcess: {
-        batchSize: 100,
       },
     };
     // One liner to make sure file is being served.
@@ -109,32 +114,7 @@ describe.only('Server diff 2 ', () => {
 
     expect(apiJson)
       .excludingEvery(['id', 'baseFileId', 'deltaFileId', 'createdAt', 'time'])
-      .to.deep.equal({
-        base: {
-          file: {
-            ...body.base,
-            path: `${paths.data}/snapshots/sample/v1.csv`,
-          },
-          done: ['created', 'downloaded'],
-        },
-        delta: {
-          file: {
-            ...body.delta,
-            path: `${paths.data}/snapshots/sample/v2.csv`,
-          },
-          done: ['created', 'downloaded'],
-        },
-        diff: {
-          flagHash: 'a3876462b7432a46db63d4da1b87208f',
-          format: 'rowmark',
-          lineCount: 2,
-          path: `${paths.data}/diffs/sample/v1-v2.a3876462.rowmark.csv`,
-          url: `${paths.url}/data/diffs/sample/v1-v2.a3876462.rowmark.csv`,
-          additions: 0,
-          modifications: 1,
-          deletions: 0,
-        },
-      });
+      .to.deep.equal(postDiffTestResponse({ body }));
 
     const dataResponse = await fetch(apiJson.diff.url);
     const data = await dataResponse.text();
@@ -180,7 +160,7 @@ describe.only('Server diff 2 ', () => {
         time: true,
       },
       postProcess: {
-        batchSize: 10,
+        batchSize: 1,
       },
     };
     // One liner to make sure file is being served.
@@ -200,40 +180,34 @@ describe.only('Server diff 2 ', () => {
 
     const apiJson = await apiResponse.json();
 
-    // console.log(apiJson);
+    // console.log(apiJson.diff);
+    // console.log(apiJson.dist);
 
-    // expect(apiJson)
-    //   .excludingEvery(['id', 'baseFileId', 'deltaFileId', 'createdAt', 'time'])
-    //   .to.deep.equal({
-    //     base: {
-    //       file: {
-    //         ...body.base,
-    //         path: `${paths.data}/snapshots/sample/v1.csv`,
-    //       },
-    //       done: ['created', 'downloaded'],
-    //     },
-    //     delta: {
-    //       file: {
-    //         ...body.delta,
-    //         path: `${paths.data}/snapshots/sample/v2.csv`,
-    //       },
-    //       done: ['created', 'downloaded'],
-    //     },
-    //     diff: {
-    //       flagHash: 'a3876462b7432a46db63d4da1b87208f',
-    //       format: 'rowmark',
-    //       lineCount: 2,
-    //       path: `${paths.data}/diffs/sample/v1-v2.a3876462.rowmark.csv`,
-    //       url: `${paths.url}/data/diffs/sample/v1-v2.a3876462.rowmark.csv`,
-    //       additions: 0,
-    //       modifications: 1,
-    //       deletions: 0,
-    //     },
-    //   });
+    expect(apiJson)
+      .excludingEvery(['id', 'baseFileId', 'deltaFileId', 'createdAt', 'time'])
+      .to.deep.equal(postDiffSmallResponse({ body }));
 
-    // const dataResponse = await fetch(apiJson.diff.url);
-    // const data = await dataResponse.text();
-    // expect(data).to.equal('t1,t2,CSVDIFF_STATE\nv1,v2e,MODIFIED\n');
+    const dataResponse = await fetch(apiJson.diff.url);
+    const data = await dataResponse.text();
+
+    const expected = await fs.readFile(
+      '/app/test/expected/diff-small.rowmark.csv'
+    );
+    expect(data.split('\n')).to.deep.equalInAnyOrder(`${expected}`.split('\n'));
+
+    // Test the dist files
+    for (const dist of apiJson.dist) {
+      const distResponse = await fetch(dist.url);
+      const distText = await distResponse.text();
+      for (const line of distText.split('\n')) {
+        expect(`${expected}`.split('\n')).contains(line);
+      }
+    }
+
+    // Make a Dist model
+    // Read and write to Dist in database
+    // Add some real world data
+    // Test and implement jsonata
   }).timeout(15000);
 
   xit('post : diff', async () => {

@@ -14,27 +14,9 @@ const processRow = async (row, transformPresets) => {
 const postProcess = async (diff, options, target) => {
   // console.log({ diff, options, target });
 
-  const { lineCount: lineCount } = diff;
-
-  const transformPresets = {},
-    validateFilters = {};
-
-  let { writerHeaders } = options;
-  const { batchSize = 500 } = options;
-  console.log(batchSize);
-
-  console.log('>>>>> Enter processCsvFile');
-  // logger.info({ writerHeaders, validateFilters });
-
-  let csvParseResult,
-    validRows = { ADDED: 0, MODIFIED: 0, DELETED: 0, total: 0 },
-    writePromises = [],
-    result = {},
-    onePercent = Math.round(lineCount / 100);
-
-  //   return;
-
-  const csvStreams = {
+  const { lineCount: lineCount } = diff,
+    { batchSize = 500 } = options,
+    csvStreams = {
       ADDED: [],
       MODIFIED: [],
       DELETED: [],
@@ -43,7 +25,16 @@ const postProcess = async (diff, options, target) => {
       ADDED: [],
       MODIFIED: [],
       DELETED: [],
-    };
+    },
+    transformPresets = {},
+    validateFilters = {};
+
+  let csvParseResult,
+    { writerHeaders } = options,
+    validRows = { ADDED: 0, MODIFIED: 0, DELETED: 0, total: 0 },
+    writePromises = [],
+    result = {},
+    onePercent = Math.round(lineCount / 100);
 
   const makeCsvStream = async (diffState, i) => {
     const thisTarget = `${target.dir}/${diffState}-${i}-${target.extension}`;
@@ -86,9 +77,7 @@ const postProcess = async (diff, options, target) => {
                 // TODO: add a filter for writerHeaders
                 // Otherwise, dist csv could have many un-used headers.
                 if (!writerHeaders) writerHeaders = Object.values(headers);
-
                 // console.log({ headers });
-
                 return headers;
               },
             })
@@ -99,7 +88,6 @@ const postProcess = async (diff, options, target) => {
             })
         )
         .on('error', (error) => {
-          // console.error(error);
           reject(error);
         })
         .on('data', async (row) => {
@@ -160,15 +148,26 @@ const postProcess = async (diff, options, target) => {
         .on('end', async () => {
           await Promise.all(writePromises);
 
-          console.log('all promises are resolved');
+          // console.log('all promises are resolved');
 
           csvStreams.ADDED.slice(-1)[0].end();
           csvStreams.MODIFIED.slice(-1)[0].end();
           csvStreams.DELETED.slice(-1)[0].end();
 
-          return resolve({
-            processed: true,
-          });
+          return resolve([
+            ...writeStreams.ADDED.map((s) => ({
+              path: s.path,
+              diffState: 'added',
+            })),
+            ...writeStreams.MODIFIED.map((s) => ({
+              path: s.path,
+              diffState: 'modified',
+            })),
+            ...writeStreams.DELETED.map((s) => ({
+              path: s.path,
+              diffState: 'deleted',
+            })),
+          ]);
         });
     });
   } catch (error) {
@@ -178,8 +177,8 @@ const postProcess = async (diff, options, target) => {
   }
 
   // console.log(writeStreams);
+  // console.log(csvParseResult);
 
-  console.log('<<<<<< Exit processCsvFile');
-  return result;
+  return csvParseResult;
 };
 export { postProcess };

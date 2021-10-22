@@ -101,6 +101,7 @@ export default async (params, File, Diff) => {
   // }
   // target += `/diff.${extension}`;
 
+  let dist;
   if (params.postProcess) {
     let target = {
       dir: `${diffPath}/dist`,
@@ -111,15 +112,18 @@ export default async (params, File, Diff) => {
       target.dir += `-${objectHash(params.postProcess).substring(0, 6)}`;
     }
     try {
-      postProcess(diff, params.postProcess, target);
+      dist = await postProcess(diff, params.postProcess, target);
     } catch (e) {
       console.error(e);
     }
   }
 
+  // console.log(dist);
+
   return {
     base,
     delta,
     diff: withUrls(diff),
+    dist: withUrls(dist),
   };
 };

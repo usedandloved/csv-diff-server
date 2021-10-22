@@ -15,11 +15,16 @@ const withUrls = (data) => {
     }
   };
 
+  // console.log(data);
+
   if (Array.isArray(data)) {
     data.forEach((object) => {
       populate(object);
     });
-  } else {
+  } else if (typeof data === 'object') {
+    // Object.keys(data).forEach((x) => {
+    //   populate(data[x]);
+    // });
     populate(data);
   }
 

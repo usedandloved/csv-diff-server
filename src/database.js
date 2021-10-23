@@ -6,13 +6,14 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
   let db, tableNames;
 
   try {
-    await fs.ensureDir(path.dirname(target));
     // db = new Database(path, { verbose: console.log });
     db = new Database(target);
   } catch (e) {
     console.error(e);
     throw e;
   }
+
+  // return;
 
   try {
     const stmt = db.prepare(
@@ -54,7 +55,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       lineCount     INTEGER    NOT NULL,
       flagHash      text       NOT NULL,
       format        text       NOT NULL,
-      time          REAL,
+      time          INTEGER,
       additions     INTEGER,
       modifications INTEGER,
       deletions     INTEGER,

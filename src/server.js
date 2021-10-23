@@ -6,7 +6,7 @@ import { getDist } from './models/Dist.js';
 import main from './main.js';
 import { paths, withUrls } from './lib/fs.js';
 
-let server;
+let server, db;
 const port = process.env.PORT || 3000;
 
 /**
@@ -16,7 +16,8 @@ const port = process.env.PORT || 3000;
 process.stdin.resume();
 async function exitHandler(options, exitCode) {
   console.log('In exitHandler');
-  await server.close();
+  await server?.close();
+  await db?.close();
   if (exitCode || exitCode === 0) console.log(exitCode);
   if (options.exit) process.exit();
 }

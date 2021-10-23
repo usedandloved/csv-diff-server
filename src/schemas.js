@@ -3,7 +3,7 @@ const snapshotSchema = {
   required: ['source', 'revision'],
   additionalProperties: false,
   properties: {
-    dataset: { type: 'string', pattern: '^[A-z0-9]+$' },
+    dataset: { type: 'string', pattern: '^[A-z0-9-]+$' },
     revision: {
       type: 'string',
       pattern: '^[A-z0-9]+$',

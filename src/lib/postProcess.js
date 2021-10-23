@@ -15,7 +15,12 @@ const postProcess = async (diff, options, target) => {
   // console.log({ diff, options, target });
 
   const { lineCount: lineCount } = diff,
-    { batchSize = 500 } = options,
+    {
+      batchSize = 500,
+      updatePercentage = (percent) => {
+        console.log({ percent });
+      },
+    } = options,
     csvStreams = {},
     possibleDiffStates = ['added', 'modified', 'deleted'],
     writeStreams = {},
@@ -24,9 +29,9 @@ const postProcess = async (diff, options, target) => {
 
   let csvParseResult,
     { writerHeaders } = options,
-    validRows = { total: 0 },
+    rowCount = { total: 0 },
     writePromises = [],
-    onePercent = Math.round(lineCount / 100);
+    onePercent = Math.round((lineCount - 1) / 100);
 
   const makeCsvStream = async (diffState, i) => {
     const thisTarget = `${target.dir}/${diffState}-${i}-${target.extension}`;
@@ -55,7 +60,7 @@ const postProcess = async (diff, options, target) => {
     // Init empty arrays and counters for possibleDiffStates
     csvStreams[diffState] = [];
     writeStreams[diffState] = [];
-    validRows[diffState] = 0;
+    rowCount[diffState] = 0;
     try {
       // Make csvStreams for possibleDiffStates
       makeCsvStreamPromises.push(makeCsvStream(diffState, 0));
@@ -94,7 +99,7 @@ const postProcess = async (diff, options, target) => {
           reject(error);
         })
         .on('data', async (row) => {
-          let processedRow = await processRow(row, transformPresets);
+          let processedRowPromise = processRow(row, transformPresets);
 
           // processedRow = await filters(
           //   { processedRow, row },
@@ -102,7 +107,14 @@ const postProcess = async (diff, options, target) => {
           //   options
           // );
 
-          // console.log('start');
+          rowCount.total++;
+
+          if (rowCount.total % onePercent === 0) {
+            const percent = Math.round(rowCount.total / onePercent);
+            updatePercentage(percent);
+          }
+
+          const processedRow = await processedRowPromise;
 
           if (!processedRow) return;
 
@@ -110,8 +122,7 @@ const postProcess = async (diff, options, target) => {
 
           const diffState = row?.CSVDIFF_STATE.toLowerCase() || 'added';
 
-          const thisValidRows = validRows[diffState]++;
-          validRows.total++;
+          const thisValidRows = rowCount[diffState]++;
 
           const index = Math.floor(thisValidRows / batchSize);
 
@@ -127,20 +138,10 @@ const postProcess = async (diff, options, target) => {
             oldCsvStream.end();
           }
 
-          // console.log('writing');
-          // console.log({ diffState, index, processedRow });
+          writePromises.push(
+            csvStreams[diffState].slice(-1)[0].write(processedRow)
+          );
 
-          writePromises.push(csvStreams[diffState][index].write(processedRow));
-
-          // if (validRows[diffState] % 1000 === 0) {
-          //   console.log({ validRows[diffState] });
-          // }
-          // if (validRows.total % onePercent === 0) {
-          //   // console.log({ validRows[diffState] });
-          //   const percent = validRows[diffState] / onePercent;
-          //   // console.log({ percent });
-          //   updatePercentage(percent);
-          // }
           return;
         })
         .on('end', async () => {
@@ -152,7 +153,7 @@ const postProcess = async (diff, options, target) => {
             // End the last stream
             csvStreams[diffState].slice(-1)[0].end();
             // If no valid rows for this diff state then...
-            if (!validRows[diffState]) {
+            if (!rowCount[diffState]) {
               // Delete the empty file
               fs.remove(writeStreams[diffState][0].path);
               // And continue the loop.
@@ -175,6 +176,8 @@ const postProcess = async (diff, options, target) => {
     console.error(error);
     throw error;
   }
+
+  updatePercentage(100);
 
   return csvParseResult;
 };

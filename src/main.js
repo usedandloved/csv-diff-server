@@ -62,7 +62,13 @@ export default async (params, File, Diff, Dist) => {
 
   diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
 
-  if (!diff || !(await fs.pathExists(diff.path))) {
+  if (diff && !(await fs.pathExists(diff.path))) {
+    await Dist.DeleteByDiffId({ diffId: diff.id });
+    await Diff.DeleteByFileIdsHashFormat(diffUniqueProps);
+    diff = undefined;
+  }
+
+  if (!diff) {
     const diffResult = await csvdiff({
       base: base.file.path,
       delta: delta.file.path,
@@ -91,16 +97,6 @@ export default async (params, File, Diff, Dist) => {
     }
   }
 
-  // let target = `${paths.data}/${base.file.dataset}`;
-  // if (base.file.dataset !== delta.file.dataset) {
-  //   target += `-${delta.file.dataset}`;
-  // }
-  // target += `/${base.file.revision}-${delta.file.revision}`;
-  // if (flagHashShort) {
-  //   target += `-${flagHashShort}`;
-  // }
-  // target += `/diff.${extension}`;
-
   let dists;
 
   if (params.postProcess) {
@@ -113,7 +109,7 @@ export default async (params, File, Diff, Dist) => {
 
     // console.log(dists);
 
-    if (!dists.length && (await isDistPathsIsMissing(dists))) {
+    if (dists.length && (await isDistPathsIsMissing(dists))) {
       console.error('a dist path is missing. Will re-do');
       Dist.DeleteMany(dists);
       dists = [];

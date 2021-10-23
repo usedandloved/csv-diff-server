@@ -55,6 +55,8 @@ const downloadFile = async (source, target, options = {}) => {
 };
 
 const isDistPathsIsMissing = async (dists) => {
+  console.log('in isDistPathsIsMissing');
+  console.log(dists);
   const promises = [];
   for (const dist of dists) {
     promises.push(fs.pathExists(dist.path));

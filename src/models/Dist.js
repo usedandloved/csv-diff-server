@@ -33,6 +33,10 @@ const getDist = async (db) => {
 
   const deleteOne = db.prepare('DELETE FROM dist WHERE id = (@id)');
 
+  const deleteByDiffId = db.prepare(
+    'DELETE FROM dist WHERE diffId = (@diffId)'
+  );
+
   // const deleteAll = db.prepare('DELETE FROM file');
 
   return {
@@ -55,6 +59,10 @@ const getDist = async (db) => {
     DeleteMany: (dists) => {
       // console.log('creating dist', params);
       return deleteMany(dists);
+    },
+    DeleteByDiffId: (params) => {
+      // console.log('deleting csv', params);
+      return deleteByDiffId.run(params);
     },
     // Delete: (params) => {
     //   // console.log('deleting csv', params);

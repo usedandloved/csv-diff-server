@@ -18,7 +18,7 @@ export default async ({ base, delta, flagString, target }) => {
     diffResult = await new Promise(function (resolve, reject) {
       let stderr = '',
         lineCount = 0,
-        csvdiffConsole = {};
+        csvdiffConsole = { time: undefined };
 
       /**
        * csvdiff output is piped to a file in /tmp...
@@ -41,15 +41,36 @@ export default async ({ base, delta, flagString, target }) => {
       );
 
       script.stdout.on('data', (data) => {
+        console.log(data);
         lineCount = parseInt(data);
       });
 
       script.stderr.on('data', (data) => {
         stderr += `stderr: ${data}\n`;
 
-        const timeMatch = data.match(/^csvdiff took (\d+.\d+)ms/);
-        if (timeMatch?.[1]) {
-          return (csvdiffConsole.time = parseFloat(timeMatch[1]));
+        // console.log(data);
+
+        const timeMatch = data.match(
+          /^csvdiff took ((\d+)m)*((\d+.\d+)s)*((\d+.\d+)ms)*/
+        );
+
+        // console.log({ timeMatch });
+
+        if (timeMatch?.[2] || timeMatch?.[4] || timeMatch?.[6]) {
+          csvdiffConsole.time = 0;
+          if (timeMatch?.[2]) {
+            csvdiffConsole.time += parseInt(timeMatch[2]) * 60 * 1000 * 1000;
+          }
+          if (timeMatch?.[4]) {
+            csvdiffConsole.time += parseFloat(timeMatch[4]) * 1000 * 1000;
+          }
+          if (timeMatch?.[6]) {
+            csvdiffConsole.time += parseFloat(timeMatch[6]) * 1000;
+          }
+          csvdiffConsole.time = parseInt(csvdiffConsole.time);
+          // Integer of time in microseconds
+          // console.log(csvdiffConsole.time);
+          return;
         }
 
         const countMatch = [

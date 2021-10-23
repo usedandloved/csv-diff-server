@@ -29,6 +29,16 @@ const getDiff = async (db) => {
 
   const getAll = db.prepare('SELECT * FROM diff');
 
+  const deleteByFileIdsHashFormat = db.prepare(
+    `
+    DELETE FROM diff 
+    WHERE baseFileId = (@baseFileId) 
+    AND deltaFileId = (@deltaFileId)
+    AND flagHash = (@flagHash)
+    AND format = (@format)
+    `
+  );
+
   // const deleteOne = db.prepare('DELETE FROM file WHERE path = (@path)');
 
   // const deleteAll = db.prepare('DELETE FROM file');
@@ -36,6 +46,7 @@ const getDiff = async (db) => {
   return {
     Create: (params) => {
       // console.log('creating diff', params);
+      if (!params.time) params.time = null;
       return insert.run(params);
     },
     GetByFileIdsHashFormat: (params) => {
@@ -45,6 +56,10 @@ const getDiff = async (db) => {
     GetAll: () => {
       console.log('get all diffs');
       return getAll.all();
+    },
+    DeleteByFileIdsHashFormat: (params) => {
+      // console.log(params);
+      return deleteByFileIdsHashFormat.run(params);
     },
     // Delete: (params) => {
     //   // console.log('deleting csv', params);

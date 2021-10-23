@@ -18,14 +18,16 @@ const postProcess = async (diff, options, target) => {
     {
       batchSize = 500,
       updatePercentage = (percent) => {
-        console.log({ percent });
+        // console.log({ percent });
       },
     } = options,
     csvStreams = {},
     possibleDiffStates = ['added', 'modified', 'deleted'],
+    timers = {},
     writeStreams = {},
     transformPresets = {},
-    validateFilters = {};
+    validateFilters = {},
+    dataPromises = [];
 
   let csvParseResult,
     { writerHeaders } = options,
@@ -34,6 +36,9 @@ const postProcess = async (diff, options, target) => {
     onePercent = Math.round((lineCount - 1) / 100);
 
   const makeCsvStream = async (diffState, i) => {
+    // Set the start time
+    timers[diffState][i] = { startedAt: new Date() };
+
     const thisTarget = `${target.dir}/${diffState}-${i}-${target.extension}`;
 
     await fs.ensureFile(thisTarget);
@@ -46,11 +51,13 @@ const postProcess = async (diff, options, target) => {
 
     writeStreams[diffState][i] = fs.createWriteStream(thisTarget);
 
-    tempCsvStream
-      .pipe(writeStreams[diffState][i])
-      .on('end', () => writeStreams[diffState][i].end());
+    tempCsvStream.pipe(writeStreams[diffState][i]);
 
     csvStreams[diffState][i] = tempCsvStream;
+
+    csvStreams[diffState][i].on('end', () => {
+      writeStreams[diffState][i].end();
+    });
 
     return;
   };
@@ -59,6 +66,7 @@ const postProcess = async (diff, options, target) => {
   for (const diffState of possibleDiffStates) {
     // Init empty arrays and counters for possibleDiffStates
     csvStreams[diffState] = [];
+    timers[diffState] = [];
     writeStreams[diffState] = [];
     rowCount[diffState] = 0;
     try {
@@ -99,6 +107,8 @@ const postProcess = async (diff, options, target) => {
           reject(error);
         })
         .on('data', async (row) => {
+          // res();
+
           let processedRowPromise = processRow(row, transformPresets);
 
           // processedRow = await filters(
@@ -129,25 +139,33 @@ const postProcess = async (diff, options, target) => {
           // console.log(index);
 
           if (thisValidRows % batchSize === 0 && thisValidRows > 0) {
+            // Set the end time of the previous batch
+            timers[diffState][index - 1].endedAt = new Date();
+
             const oldCsvStream = csvStreams[diffState].slice(-1)[0];
 
             writePromises.push(makeCsvStream(diffState, index));
 
             await Promise.all(writePromises);
 
-            oldCsvStream.end();
+            writePromises.push(oldCsvStream.end());
           }
 
           writePromises.push(
             csvStreams[diffState].slice(-1)[0].write(processedRow)
           );
-
-          return;
         })
         .on('end', async () => {
+          // console.log(dataPromises);
+          // await Promise.all(dataPromises);
           await Promise.all(writePromises);
 
           const result = [];
+
+          const calcDuration = (o) => {
+            if (!o.startedAt) return null;
+            return Math.abs((o.endedAt ? o.endedAt : new Date()) - o.startedAt);
+          };
 
           for (const diffState of possibleDiffStates) {
             // End the last stream
@@ -161,9 +179,10 @@ const postProcess = async (diff, options, target) => {
             }
             // Push the write streams to the result
             result.push(
-              ...writeStreams[diffState].map((s) => ({
+              ...writeStreams[diffState].map((s, i) => ({
                 path: s.path,
                 diffState,
+                time: calcDuration(timers[diffState][i]),
               }))
             );
           }
@@ -178,6 +197,8 @@ const postProcess = async (diff, options, target) => {
   }
 
   updatePercentage(100);
+
+  // console.log(csvParseResult);
 
   return csvParseResult;
 };

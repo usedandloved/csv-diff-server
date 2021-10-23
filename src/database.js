@@ -80,6 +80,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       diffId          INTEGER    NOT NULL,
       postProcessHash text       NOT NULL,
       diffState       text       NOT NULL,
+      time            INTEGER,
       createdAt       integer(4) not null default (strftime('%s','now')), 
       FOREIGN KEY (diffId) 
         REFERENCES diff(id)

@@ -41,7 +41,7 @@ export default async ({ base, delta, flagString, target }) => {
       );
 
       script.stdout.on('data', (data) => {
-        console.log(data);
+        // console.log(data);
         lineCount = parseInt(data);
       });
 
@@ -59,13 +59,13 @@ export default async ({ base, delta, flagString, target }) => {
         if (timeMatch?.[2] || timeMatch?.[4] || timeMatch?.[6]) {
           csvdiffConsole.time = 0;
           if (timeMatch?.[2]) {
-            csvdiffConsole.time += parseInt(timeMatch[2]) * 60 * 1000 * 1000;
+            csvdiffConsole.time += parseInt(timeMatch[2]) * 60 * 1000;
           }
           if (timeMatch?.[4]) {
-            csvdiffConsole.time += parseFloat(timeMatch[4]) * 1000 * 1000;
+            csvdiffConsole.time += parseFloat(timeMatch[4]) * 1000;
           }
           if (timeMatch?.[6]) {
-            csvdiffConsole.time += parseFloat(timeMatch[6]) * 1000;
+            csvdiffConsole.time += parseInt(timeMatch[6]);
           }
           csvdiffConsole.time = parseInt(csvdiffConsole.time);
           // Integer of time in microseconds

@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
+import zlib from 'zlib';
 
 const paths = {
   url: process.env.PATHS_URL?.replace(/\/$/, '') || '',
@@ -56,7 +57,7 @@ const downloadFile = async (source, target, options = {}) => {
 
 const isDistPathsIsMissing = async (dists) => {
   console.log('in isDistPathsIsMissing');
-  console.log(dists);
+  // console.log(dists);
   const promises = [];
   for (const dist of dists) {
     promises.push(fs.pathExists(dist.path));

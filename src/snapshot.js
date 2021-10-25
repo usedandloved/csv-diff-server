@@ -43,7 +43,9 @@ const processSnapshot = async (
 
   // Does dbFile.source match source?
   if (file.source && source && file.source !== source) {
-    throw 'a different source was previously used for for this dataset and revision';
+    console.warn(
+      'a different source was previously used for for this dataset and revision'
+    );
   }
 
   // file.path is not set. Or file.path is not on the file system

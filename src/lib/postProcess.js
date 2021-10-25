@@ -7,25 +7,30 @@ const validateRow = async (data, validateFilters) => {
   return true;
 };
 
-const processRow = async (row, transformPresets) => {
+const processRow = async (row, transforms) => {
+  // console.log({ transforms });
+  // console.log(JSON.stringify(row));
+  try {
+    var expression = jsonata(transforms);
+    var result = expression.evaluate(row); // returns 24
+
+    // console.log(result);
+    return result;
+  } catch (e) {
+    console.error(e);
+  }
   return row;
 };
 
-const postProcess = async (diff, options, target) => {
+const postProcess = async (diff, options, target, updatePercentage) => {
   // console.log({ diff, options, target });
 
   const { lineCount: lineCount } = diff,
-    {
-      batchSize = 500,
-      updatePercentage = (percent) => {
-        // console.log({ percent });
-      },
-    } = options,
+    { batchSize = 50000, transforms } = options,
     csvStreams = {},
     possibleDiffStates = ['added', 'modified', 'deleted'],
     timers = {},
     writeStreams = {},
-    transformPresets = {},
     validateFilters = {},
     dataPromises = [];
 
@@ -109,7 +114,9 @@ const postProcess = async (diff, options, target) => {
         .on('data', async (row) => {
           // res();
 
-          let processedRowPromise = processRow(row, transformPresets);
+          let processedRowPromise = transforms
+            ? processRow(row, transforms)
+            : row;
 
           // processedRow = await filters(
           //   { processedRow, row },

@@ -5,9 +5,12 @@ import { getDiff } from './models/Diff.js';
 import { getDist } from './models/Dist.js';
 import main from './main.js';
 import { paths, withUrls } from './lib/fs.js';
+import { msToTime, waitSeconds, objectHash } from './lib/utils.js';
+import { withMemStore } from './lib/withMemStore.js';
 
 let server, db;
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000,
+  requestTimeOutMs = 2000;
 
 /**
  * Close server on restart or shutdown
@@ -44,6 +47,8 @@ const getServer = async ({ databaseOptions } = {}) => {
   app.set('views', '/app/src/views');
 
   app.set('view engine', 'ejs');
+
+  app.locals.msToTime = msToTime;
 
   app.use(express.json());
 
@@ -121,13 +126,30 @@ const getServer = async ({ databaseOptions } = {}) => {
   });
 
   app.post('/api/diff', async (req, res, next) => {
-    let diff;
+    let promises;
+    const { value, getValue, updateValue } = withMemStore(
+      `/api/diff/${objectHash(req.body)}`
+    );
+
+    if (
+      (value && Object.values(value)?.includes('pending')) ||
+      value?.dists?.progress
+    ) {
+      return res.send(value);
+    }
+
     try {
-      diff = await main(req.body, File, Diff, Dist);
+      promises = [
+        main(req.body, File, Diff, Dist, updateValue),
+        new Promise((resolve) =>
+          setTimeout(() => resolve(getValue()), requestTimeOutMs)
+        ),
+      ];
     } catch (e) {
       console.log(e);
     }
-    res.send(diff);
+
+    res.send(await Promise.any(promises));
   });
 
   app.use('/data', express.static(paths.data));

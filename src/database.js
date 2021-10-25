@@ -109,6 +109,16 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
   //     console.error(e);
   //   }
   // }
+
+  // let deleteAllDist, deleteAllDiff, deleteAllFile;
+  // deleteAllDist = db.prepare('DELETE FROM dist');
+  // deleteAllDiff = db.prepare('DELETE FROM diff');
+  // deleteAllFile = db.prepare('DELETE FROM file');
+  // // await new Promise((resolve) => setTimeout(resolve, 500));
+  // await deleteAllDist.run();
+  // await deleteAllDiff.run();
+  // await deleteAllFile.run();
+
   return db;
 };
 

@@ -1,6 +1,6 @@
 const snapshotSchema = {
   type: 'object',
-  required: ['source', 'revision'],
+  required: ['revision'],
   additionalProperties: false,
   properties: {
     dataset: { type: 'string', pattern: '^[A-z0-9-]+$' },

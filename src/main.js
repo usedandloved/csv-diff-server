@@ -7,18 +7,26 @@ import { diffParamsSchema } from './schemas.js';
 import { paths, withUrls, isDistPathsIsMissing } from './lib/fs.js';
 import csvdiff, { processFlags } from './lib/csvdiff.js';
 import { postProcess } from './lib/postProcess.js';
-import { objectHash } from './lib/utils.js';
+import { objectHash, waitSeconds } from './lib/utils.js';
 
 const validator = new Validator(diffParamsSchema);
 
-export default async (params, File, Diff, Dist) => {
+export default async (params, File, Diff, Dist, updateResponse) => {
   const validResult = validator.validate(params);
 
   if (!validResult.valid) {
     console.error('invalid params', validResult);
     return {};
   }
+
   let diff, flagString, flagHash, flagHashShort, format, extension, base, delta;
+
+  updateResponse({
+    base: { progress: 'pending' },
+    delta: { progress: 'pending' },
+    diff: { progress: 'pending' },
+    dists: params.postProcess ? { progress: 'pending' } : undefined,
+  });
 
   try {
     ({ flagString, flagHash, flagHashShort, format, extension } =
@@ -26,6 +34,8 @@ export default async (params, File, Diff, Dist) => {
   } catch (e) {
     console.error(e);
   }
+
+  // if (isTimedOut) return result;
 
   // console.log(params);
   // console.log({ flagString, extension });
@@ -35,11 +45,16 @@ export default async (params, File, Diff, Dist) => {
   } catch (e) {
     console.error(e);
   }
+
+  updateResponse({ base });
+
   try {
     delta = await processSnapshot(File, params.delta, params.preProcess);
   } catch (e) {
     console.error(e);
   }
+
+  updateResponse({ delta });
 
   // console.log({ base, delta });
 
@@ -97,6 +112,8 @@ export default async (params, File, Diff, Dist) => {
     }
   }
 
+  updateResponse({ diff: withUrls(diff) });
+
   let dists;
 
   if (params.postProcess) {
@@ -126,7 +143,14 @@ export default async (params, File, Diff, Dist) => {
         target.dir += `-${postProcessHash.substring(0, 6)}`;
       }
       try {
-        dists = await postProcess(diff, params.postProcess, target);
+        dists = await postProcess(
+          diff,
+          params.postProcess,
+          target,
+          (percentage) => {
+            updateResponse({ dists: { progress: percentage } });
+          }
+        );
       } catch (e) {
         console.error(e);
       }
@@ -141,9 +165,7 @@ export default async (params, File, Diff, Dist) => {
     }
   }
 
-  // console.log(withUrls(dists));
-
-  // console.log(dists);
+  updateResponse(null, true);
 
   return {
     base,

@@ -28,25 +28,35 @@ export default async ({ base, delta, flagString, target }) => {
 
       // Copy the first line
       // Then run csvdiff and pipe output to target file.
-      // echo "$(head -n1 ${original}),CSVDIFF_STATE" > ${target}
 
       // console.log(`${base} ${delta} ${flagString}`);
+      const csvdiffCommand = `csvdiff ${base} ${delta} ${flagString}`;
+
+      // console.log(csvdiffCommand);
 
       const script = exec(
         ` 
         mkdir -p ${path.dirname(target)}
         echo "$(head -n1 ${base}),CSVDIFF_STATE" > ${target} 
-        csvdiff ${base} ${delta} ${flagString} >> ${target} 
+        ${csvdiffCommand} >> ${target} 
         wc -l < ${target}`
       );
 
       script.stdout.on('data', (data) => {
         // console.log(data);
+        if (data.match(/killed/)?.length) {
+          reject(new Error('csvdiff got killed response'));
+        }
+
         lineCount = parseInt(data);
       });
 
       script.stderr.on('data', (data) => {
         stderr += `stderr: ${data}\n`;
+
+        if (data.match(/killed/)?.length) {
+          reject(new Error('csvdiff got killed response'));
+        }
 
         // console.log(data);
 

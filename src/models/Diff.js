@@ -47,6 +47,9 @@ const getDiff = async (db) => {
     Create: (params) => {
       // console.log('creating diff', params);
       if (!params.time) params.time = null;
+      if (!params.additions) params.additions = null;
+      if (!params.modifications) params.modifications = null;
+      if (!params.deletions) params.deletions = null;
       return insert.run(params);
     },
     GetByFileIdsHashFormat: (params) => {

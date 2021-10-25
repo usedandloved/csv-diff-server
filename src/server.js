@@ -128,7 +128,7 @@ const getServer = async ({ databaseOptions } = {}) => {
   app.post('/api/diff', async (req, res, next) => {
     let promises;
     const { value, getValue, updateValue } = withMemStore(
-      `/api/diff/${objectHash(req.body)}`
+      objectHash(`/api/diff/${req.body}`)
     );
 
     if (

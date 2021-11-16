@@ -5,7 +5,7 @@ import zlib from 'zlib';
 
 const paths = {
   url: process.env.PATHS_URL?.replace(/\/$/, '') || '',
-  data: process.env.PATHS_DIFF || `/app/data`,
+  data: process.env.PATHS_DIFF || `/tmp/data`,
   database: process.env.PATHS_DATABASE || `/app/data/default.db`,
 };
 

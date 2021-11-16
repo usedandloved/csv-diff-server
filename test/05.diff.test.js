@@ -184,6 +184,10 @@ describe('Server diff 2 ', () => {
       },
       postProcess: {
         batchSize: 1,
+        // transforms: `{
+        //   "GlobalRank" : $number(GlobalRank) * 100,
+        //   "DomainAndTLD" : $join([Domain, TLD], " ")
+        // }`,
       },
     };
     // One liner to make sure file is being served.

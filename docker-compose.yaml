@@ -20,6 +20,8 @@ services:
     # - - - - - - -
     environment:
       - APP_ENV=development
+      - PATHS_URL=http://localhost:3000
+      - LOG_MODE=local
 
 volumes:
   csv_diff_server_node_modules:

@@ -13,6 +13,7 @@ jobs:
         with:
           name: usedandloved/csv-diff-server
           username: ${{ github.actor }}
+          # https://github.com/usedandloved/${repo}/settings/secrets/actions
           password: ${{ secrets.GHCR_SECRET }}
           registry: ghcr.io
           default_branch: main

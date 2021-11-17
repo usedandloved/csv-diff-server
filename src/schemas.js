@@ -6,7 +6,7 @@ const snapshotSchema = {
     dataset: { type: 'string', pattern: '^[A-z0-9-]+$' },
     revision: {
       type: 'string',
-      pattern: '^[A-z0-9]+$',
+      pattern: /^[A-z0-9\s\:\-]+$/,
     },
     source: { type: 'string', format: 'uri' },
   },

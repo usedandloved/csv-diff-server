@@ -27,6 +27,7 @@ const postDiffTestResponse = ({ body }) => ({
   },
   dists: [
     {
+      fileId: null,
       path: '/tmp/data/sample/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
       diffState: 'modified',
       postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
@@ -61,30 +62,35 @@ const postDiffSmallResponse = ({ body }) => ({
   },
   dists: [
     {
+      fileId: null,
       path: '/tmp/data/small/v1-v2-yHAQmz/dist-COrKao/added-0-rowmark.csv',
       diffState: 'added',
       url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/added-0-rowmark.csv',
       postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
+      fileId: null,
       path: '/tmp/data/small/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
       diffState: 'modified',
       url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
       postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
+      fileId: null,
       path: '/tmp/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-0-rowmark.csv',
       diffState: 'deleted',
       url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-0-rowmark.csv',
       postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
+      fileId: null,
       path: '/tmp/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-1-rowmark.csv',
       diffState: 'deleted',
       url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-1-rowmark.csv',
       postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
     },
     {
+      fileId: null,
       path: '/tmp/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-2-rowmark.csv',
       diffState: 'deleted',
       url: 'http://localhost:3001/data/small/v1-v2-yHAQmz/dist-COrKao/deleted-2-rowmark.csv',

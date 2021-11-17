@@ -7,6 +7,8 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
 
   await fs.ensureDir(path.dirname(target));
 
+  // console.log({ target });
+
   try {
     // db = new Database(path, { verbose: console.log });
     db = new Database(target);
@@ -80,6 +82,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       id              INTEGER    PRIMARY KEY AUTOINCREMENT,
       path            text       UNIQUE,
       diffId          INTEGER,
+      fileId          INTEGER,
       postProcessHash text       NOT NULL,
       diffState       text       NOT NULL,
       time            INTEGER,

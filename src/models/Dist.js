@@ -4,10 +4,10 @@ const getDist = async (db) => {
   const insert = db.prepare(
     ` 
     INSERT INTO dist 
-      ( diffId, path, diffState, postProcessHash, time
+      ( diffId, fileId, path, diffState, postProcessHash, time
       ) 
     VALUES
-      ( @diffId, @path, @diffState, @postProcessHash, @time
+      ( @diffId, @fileId, @path, @diffState, @postProcessHash, @time
       )`
   );
 
@@ -21,6 +21,14 @@ const getDist = async (db) => {
     `
     SELECT * FROM dist 
     WHERE diffId = (@diffId) 
+    AND postProcessHash = (@postProcessHash)
+    `
+  );
+
+  const getByFileIdPostProcessHash = db.prepare(
+    `
+    SELECT * FROM dist 
+    WHERE fileId = (@fileId) 
     AND postProcessHash = (@postProcessHash)
     `
   );
@@ -51,6 +59,10 @@ const getDist = async (db) => {
     GetByDiffIdPostProcessHash: (params) => {
       // console.log(params);
       return getByDiffIdPostProcessHash.all(params);
+    },
+    GetByFileIdPostProcessHash: (params) => {
+      // console.log(params);
+      return getByFileIdPostProcessHash.all(params);
     },
     GetAll: () => {
       console.log('get all dists');

@@ -12,7 +12,13 @@ import { objectHash, waitSeconds } from './lib/utils.js';
 const validator = new Validator(diffParamsSchema);
 
 export default async (params, File, Diff, Dist, updateResponse) => {
-  const validResult = validator.validate(params);
+  let validResult;
+
+  try {
+    validResult = validator.validate(params);
+  } catch (e) {
+    console.error(e);
+  }
 
   if (!validResult.valid) {
     console.error('invalid params', validResult);
@@ -127,10 +133,27 @@ export default async (params, File, Diff, Dist, updateResponse) => {
   if (params.postProcess) {
     const postProcessHash = `${objectHash(params.postProcess)}`;
 
-    dists = Dist.GetByDiffIdPostProcessHash({
-      diffId: diff.id,
-      postProcessHash,
-    });
+    if (diff.id) {
+      dists = Dist.GetByDiffIdPostProcessHash({
+        diffId: diff.id,
+        postProcessHash,
+      });
+    } else {
+      // console.log('hi');
+      // console.log(base.file.id);
+      // console.log(postProcessHash);
+      try {
+        dists = Dist.GetByFileIdPostProcessHash({
+          fileId: base.file.id,
+          postProcessHash,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // console.log({ dists });
+    // return;
 
     if (dists.length && (await isDistPathsIsMissing(dists))) {
       console.error('a dist path is missing. Will re-do');
@@ -166,6 +189,7 @@ export default async (params, File, Diff, Dist, updateResponse) => {
       dists = dists.map((obj) => ({
         ...obj,
         diffId: diff.id,
+        fileId: diff.id ? null : base.file.id,
         postProcessHash,
       }));
 

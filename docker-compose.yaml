@@ -13,10 +13,10 @@ services:
       - .:/app
       - csv_diff_server_node_modules:/app/node_modules
     # - - - - - - -
-    command: []
-    entrypoint: ['/bin/ash']
-    tty: true
-    stdin_open: true
+    # command: []
+    # entrypoint: ['/bin/ash']
+    # tty: true
+    # stdin_open: true
     # - - - - - - -
     environment:
       - APP_ENV=development

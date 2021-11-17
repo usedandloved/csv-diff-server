@@ -87,6 +87,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
     csvParseResult = await new Promise((resolve, reject) => {
       fs.createReadStream(diff.path)
         .on('error', (error) => {
+          console.log(error);
           // In-case file doesn't exist
           reject(error);
         })
@@ -124,6 +125,8 @@ const postProcess = async (diff, options, target, updatePercentage) => {
           //   options
           // );
 
+          // console.log({ row });
+
           rowCount.total++;
 
           if (rowCount.total % onePercent === 0) {
@@ -133,11 +136,11 @@ const postProcess = async (diff, options, target, updatePercentage) => {
 
           const processedRow = await processedRowPromise;
 
+          // console.log(processedRow);
+
           if (!processedRow) return;
 
-          // console.log({ processedRow });
-
-          const diffState = row?.CSVDIFF_STATE.toLowerCase() || 'added';
+          const diffState = row?.CSVDIFF_STATE?.toLowerCase() || 'added';
 
           const thisValidRows = rowCount[diffState]++;
 

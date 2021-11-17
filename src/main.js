@@ -23,8 +23,8 @@ export default async (params, File, Diff, Dist, updateResponse) => {
 
   updateResponse({
     base: { progress: 'pending' },
-    delta: { progress: 'pending' },
-    diff: { progress: 'pending' },
+    delta: params.delta ? { progress: 'pending' } : undefined,
+    diff: params.delta ? { progress: 'pending' } : undefined,
     dists: params.postProcess ? { progress: 'pending' } : undefined,
   });
 
@@ -48,71 +48,79 @@ export default async (params, File, Diff, Dist, updateResponse) => {
 
   updateResponse({ base });
 
-  try {
-    delta = await processSnapshot(File, params.delta, params.preProcess);
-  } catch (e) {
-    console.error(e);
-  }
+  let diffPath = '';
 
-  updateResponse({ delta });
-
-  // console.log({ base, delta });
-
-  let diffPath = `${paths.data}/${base.file.dataset}`;
-  if (base.file.dataset !== delta.file.dataset) {
-    diffPath += `-${delta.file.dataset}`;
-  }
-  diffPath += `/${base.file.revision}-${delta.file.revision}`;
-  if (flagHashShort) {
-    diffPath += `-${flagHashShort}`;
-  }
-  const diffTarget = `${diffPath}/csvdiff.${extension}`;
-
-  const diffUniqueProps = {
-    baseFileId: base.file.id,
-    deltaFileId: delta.file.id,
-    flagHash,
-    format,
-  };
-
-  diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
-
-  if (diff && !(await fs.pathExists(diff.path))) {
-    await Dist.DeleteByDiffId({ diffId: diff.id });
-    await Diff.DeleteByFileIdsHashFormat(diffUniqueProps);
-    diff = undefined;
-  }
-
-  if (!diff) {
-    const diffResult = await csvdiff({
-      base: base.file.path,
-      delta: delta.file.path,
-      flagString,
-      target: diffTarget,
-    });
-
-    // console.log(diffResult);
-
+  if (params.delta) {
     try {
-      await Diff.Create({
-        baseFileId: base.file.id,
-        deltaFileId: delta.file.id,
-        ...diffResult,
-        flagHash,
-        format,
+      delta = await processSnapshot(File, params.delta, params.preProcess);
+    } catch (e) {
+      console.error(e);
+    }
+    updateResponse({ delta });
+
+    // console.log({ base, delta });
+
+    diffPath = `${paths.data}/${base.file.dataset}`;
+    if (base.file.dataset !== delta.file.dataset) {
+      diffPath += `-${delta.file.dataset}`;
+    }
+    diffPath += `/${base.file.revision}-${delta.file.revision}`;
+    if (flagHashShort) {
+      diffPath += `-${flagHashShort}`;
+    }
+    const diffTarget = `${diffPath}/csvdiff.${extension}`;
+
+    const diffUniqueProps = {
+      baseFileId: base.file.id,
+      deltaFileId: delta.file.id,
+      flagHash,
+      format,
+    };
+
+    diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
+
+    if (diff && !(await fs.pathExists(diff.path))) {
+      await Dist.DeleteByDiffId({ diffId: diff.id });
+      await Diff.DeleteByFileIdsHashFormat(diffUniqueProps);
+      diff = undefined;
+    }
+
+    if (!diff) {
+      const diffResult = await csvdiff({
+        base: base.file.path,
+        delta: delta.file.path,
+        flagString,
+        target: diffTarget,
       });
-    } catch (e) {
-      console.error(e);
+
+      try {
+        await Diff.Create({
+          baseFileId: base.file.id,
+          deltaFileId: delta.file.id,
+          ...diffResult,
+          flagHash,
+          format,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+
+      try {
+        diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    try {
-      diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
-    } catch (e) {
-      console.error(e);
+    updateResponse({ diff: withUrls(diff) });
+  } else {
+    diff = { id: null, path: base.file.path };
+    diffPath = `${paths.data}/${base.file.dataset}`;
+    diffPath += `/${base.file.revision}`;
+    if (flagHashShort) {
+      diffPath += `-${flagHashShort}`;
     }
   }
-
-  updateResponse({ diff: withUrls(diff) });
 
   let dists;
 
@@ -123,8 +131,6 @@ export default async (params, File, Diff, Dist, updateResponse) => {
       diffId: diff.id,
       postProcessHash,
     });
-
-    // console.log(dists);
 
     if (dists.length && (await isDistPathsIsMissing(dists))) {
       console.error('a dist path is missing. Will re-do');
@@ -155,13 +161,19 @@ export default async (params, File, Diff, Dist, updateResponse) => {
         console.error(e);
       }
 
+      // console.log(dists);
+
       dists = dists.map((obj) => ({
         ...obj,
         diffId: diff.id,
         postProcessHash,
       }));
 
-      Dist.CreateMany(dists);
+      try {
+        Dist.CreateMany(dists);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 

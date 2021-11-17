@@ -136,7 +136,7 @@ const getServer = async ({ databaseOptions } = {}) => {
       return res.send(value);
     }
 
-    console.log('will run main');
+    // console.log('will run main');
 
     try {
       promises = [

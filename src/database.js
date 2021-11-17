@@ -5,6 +5,8 @@ import path from 'path';
 const getDb = async ({ target = 'data/default.db' } = {}) => {
   let db, tableNames;
 
+  await fs.ensureDir(path.dirname(target));
+
   try {
     // db = new Database(path, { verbose: console.log });
     db = new Database(target);
@@ -77,7 +79,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     CREATE TABLE dist (
       id              INTEGER    PRIMARY KEY AUTOINCREMENT,
       path            text       UNIQUE,
-      diffId          INTEGER    NOT NULL,
+      diffId          INTEGER,
       postProcessHash text       NOT NULL,
       diffState       text       NOT NULL,
       time            INTEGER,

@@ -19,7 +19,7 @@ const integersSchema = {
 
 const diffParamsSchema = {
   type: 'object',
-  required: ['base', 'delta'],
+  required: ['base'],
   additionalProperties: false,
   properties: {
     base: snapshotSchema,

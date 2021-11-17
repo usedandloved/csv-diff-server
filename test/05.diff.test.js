@@ -11,6 +11,7 @@ import {
   postDiffTestResponse,
   postDiffSmallResponse,
 } from './expected/index.js';
+import { waitSeconds } from '../src/lib/utils.js';
 
 chai.use(chaiExclude);
 chai.use(deepEqualInAnyOrder);
@@ -29,6 +30,7 @@ const sample2 = {
   source: `${paths.url}/test/delta-test.csv`,
   path: null,
 };
+
 const sample3 = {
   dataset: 'small',
   revision: 'v1',
@@ -43,7 +45,28 @@ const sample4 = {
   path: null,
 };
 
-describe('Server diff 2 ', () => {
+const sample5 = {
+  dataset: 'mmp',
+  revision: 'v3',
+  source: `${paths.url}/test/base-mmp.csv`,
+  path: null,
+};
+
+const sample6 = {
+  dataset: 'mmp',
+  revision: 'v4',
+  source: `${paths.url}/test/delta-mmp.csv`,
+  path: null,
+};
+
+const sample7 = {
+  dataset: 'mmp',
+  revision: 'empty1',
+  source: `${paths.url}/test/empty-mmp.csv`,
+  path: null,
+};
+
+describe.only('Server diff 2 ', () => {
   let app, db, deleteAllDist, deleteAllDiff, deleteAllFile;
 
   before(async () => {
@@ -228,6 +251,7 @@ describe('Server diff 2 ', () => {
       '/app/test/expected/diff-small.rowmark.csv'
     );
     expect(data.split('\n')).to.deep.equalInAnyOrder(`${expected}`.split('\n'));
+    // return;
 
     // Test the dist files
     for (const dist of apiJson.dists) {
@@ -243,29 +267,126 @@ describe('Server diff 2 ', () => {
     // Test and implement jsonata
   }).timeout(15000);
 
-  xit('post : diff', async () => {
+  it('post : diff mmp', async () => {
     const body = {
       base: {
-        dataset: 'sample',
-        source: sample1.source,
-        revision: sample1.revision,
+        dataset: 'mmp',
+        source: sample5.source,
+        revision: sample5.revision,
       },
       delta: {
-        dataset: 'sample',
-        source: sample2.source,
-        revision: sample2.revision,
+        dataset: 'mmp',
+        source: sample6.source,
+        revision: sample6.revision,
+      },
+      flags: {
+        format: 'rowmark',
+      },
+      postProcess: {
+        batchSize: 1000,
+        transforms: `{
+          "aw_deep_link" : aw_deep_link,
+          "product_name" : product_name,
+          "merchant_image_url" : merchant_image_url,
+          "search_price_pennies" : $number(search_price) * 100
+        }`,
       },
     };
     // One liner to make sure file is being served.
     expect((await fetch(body.base.source)).status).to.equal(200);
     expect((await fetch(body.delta.source)).status).to.equal(200);
 
-    const response = await fetch(`${paths.url}/api/diff`, {
+    const apiResponse = await fetch(`${paths.url}/api/diff`, {
       method: 'post',
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json' },
     });
 
-    // const actual = await response.text();
+    // console.log({ response });
+
+    const apiJson = await apiResponse.json();
+
+    // console.log(apiJson);
+
+    const dataResponse = await fetch(apiJson.diff.url);
+    const data = await dataResponse.text();
+
+    // console.log(data);
+
+    const expected = await fs.readFile(
+      '/app/test/expected/diff-mmp.rowmark.csv'
+    );
+
+    // Test the dist files
+    for (const dist of apiJson.dists) {
+      const distResponse = await fetch(dist.url);
+      const distText = await distResponse.text();
+
+      for (const line of distText.split('\n')) {
+        expect(`${expected}`.split('\n')).contains(line);
+      }
+    }
   }).timeout(15000);
+
+  it('post : diff undefined base', async () => {
+    const body = {
+      base: {
+        dataset: 'mmp',
+        source: sample6.source,
+        revision: sample6.revision,
+      },
+      delta: undefined,
+      flags: {
+        format: 'rowmark',
+      },
+      postProcess: {
+        batchSize: 1000,
+        transforms: `{
+          "aw_deep_link" : aw_deep_link,
+          "product_name" : product_name,
+          "merchant_image_url" : merchant_image_url,
+          "search_price_pennies" : $number(search_price) * 100
+        }`,
+      },
+    };
+
+    // One liner to make sure file is being served.
+    expect((await fetch(body.base.source)).status).to.equal(200);
+
+    const apiResponse = await fetch(`${paths.url}/api/diff`, {
+      method: 'post',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    // console.log({ response });
+
+    let apiJson = await apiResponse.json();
+
+    const dataResponse = await fetch(apiJson.diff.url);
+    const data = await dataResponse.text();
+
+    // console.log(data);
+
+    const expected = await fs.readFile(apiJson.base.file.path);
+
+    const expectedLineCount = `${expected}`.split('\n').length;
+
+    let actualLineCount = 0;
+    let i = 0;
+
+    // Test the dist files
+    for (const dist of apiJson.dists) {
+      if (i) actualLineCount -= 1;
+
+      const distResponse = await fetch(dist.url);
+      const distText = await distResponse.text();
+
+      actualLineCount += distText.split('\n').length;
+
+      i++;
+    }
+
+    expect(actualLineCount).to.equal(expectedLineCount);
+  }).timeout(60000);
 });

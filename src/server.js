@@ -131,7 +131,7 @@ const getServer = async ({ databaseOptions } = {}) => {
       objectHash(`/api/diff/${req.body}`)
     );
 
-    if (value && Object.values(value).find((x) => x.progress)) {
+    if (value && Object.values(value).find((x) => x?.progress)) {
       console.log('response from memStore');
       return res.send(value);
     }

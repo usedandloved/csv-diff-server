@@ -55,6 +55,20 @@ spec:
             - name: PATHS_DIFF
               value: {{ .Values.envVars.paths.diffs }}
 
+          volumeMounts:
+            - name: csv-diff-server-data
+              mountPath: /data/csv-diff-server
+              subPath: csv-diff-server
+
+      volumes:
+        - name: csv-diff-server-data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-csv-diff-server" (include "csv-diff-server.fullname" .)) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -68,3 +82,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+

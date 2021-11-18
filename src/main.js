@@ -61,7 +61,14 @@ export default async (params, File, Diff, Dist, updateResponse) => {
       delta = await processSnapshot(File, params.delta, params.preProcess);
     } catch (e) {
       console.error(e);
+      params.delta = undefined;
+      updateResponse({
+        delta: 'aborted - could not find file and had no source',
+      });
     }
+  }
+
+  if (params.delta) {
     updateResponse({ delta });
 
     // console.log({ base, delta });

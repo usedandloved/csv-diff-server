@@ -6,8 +6,9 @@ import jsonata from 'jsonata';
 
 const validateRow = async (data, rowValidator) => {
   if (!rowValidator) return true;
-
+  // console.log(data);
   try {
+    // console.log(rowValidator?.validate(data)?.valid);
     return rowValidator?.validate(data)?.valid || false;
   } catch (e) {
     console.error(e);

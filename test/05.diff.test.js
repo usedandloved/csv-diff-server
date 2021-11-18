@@ -290,7 +290,8 @@ describe.only('Server diff 2 ', () => {
             condition: {
               type: 'string',
               // enum: ['USED'],
-              const: 'USED',
+              // const: 'USED',
+              pattern: '^(?!(NEW)$).*$',
             },
           },
         },

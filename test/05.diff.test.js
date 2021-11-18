@@ -284,6 +284,16 @@ describe.only('Server diff 2 ', () => {
       },
       postProcess: {
         batchSize: 1000,
+        rowSchema: {
+          type: 'object',
+          properties: {
+            condition: {
+              type: 'string',
+              // enum: ['USED'],
+              const: 'USED',
+            },
+          },
+        },
         transforms: `{
           "aw_deep_link" : aw_deep_link,
           "product_name" : product_name,

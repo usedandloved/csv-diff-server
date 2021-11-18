@@ -63,6 +63,18 @@ const diffParamsSchema = {
       type: 'object',
       properties: {
         batchSize: { type: 'integer', minimum: 1 },
+        rowSchema: {
+          type: 'object',
+        },
+        transforms: {
+          type: 'string',
+        },
+        writerHeaders: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+        },
       },
     },
   },

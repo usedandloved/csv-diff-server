@@ -1,10 +1,18 @@
+import { Validator } from '@cfworker/json-schema';
 import csv from '@fast-csv/parse';
 import { format } from '@fast-csv/format';
 import fs from 'fs-extra';
 import jsonata from 'jsonata';
 
-const validateRow = async (data, validateFilters) => {
-  return true;
+const validateRow = async (data, rowValidator) => {
+  if (!rowValidator) return true;
+
+  try {
+    return rowValidator?.validate(data)?.valid || false;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 };
 
 const processRow = async (row, transforms) => {
@@ -31,8 +39,8 @@ const postProcess = async (diff, options, target, updatePercentage) => {
     possibleDiffStates = ['added', 'modified', 'deleted'],
     timers = {},
     writeStreams = {},
-    validateFilters = {},
-    dataPromises = [];
+    dataPromises = [],
+    rowValidator = options?.rowSchema && new Validator(options.rowSchema);
 
   let csvParseResult,
     { writerHeaders } = options,
@@ -105,7 +113,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
             })
             .validate((data, cb) => {
               setImmediate(async () =>
-                cb(null, await validateRow(data, validateFilters))
+                cb(null, await validateRow(data, rowValidator))
               );
             })
         )

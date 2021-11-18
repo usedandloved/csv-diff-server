@@ -21,6 +21,24 @@ spec:
       serviceAccountName: {{ include "csv-diff-server.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      
+      {{- if .Values.persistence.enabled }}
+      initContainers:
+        - name: take-data-dir-ownership
+          image: alpine:3
+          # Give `grafana` user (id 472) permissions a mounted volume
+          # https://github.com/grafana/grafana-docker/blob/master/Dockerfile
+          command:
+          - chown
+          - -R
+          - 1001:1001
+          - /data/csv-diff-server
+          volumeMounts:
+            - name: csv-diff-server-data
+              mountPath: /data/csv-diff-server
+              subPath: csv-diff-server
+      {{- end }}
+
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

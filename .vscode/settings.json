@@ -1,5 +1,8 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "cSpell.words": ["csvdiff", "dists", "rowmark"]
+  "cSpell.words": ["csvdiff", "dists", "rowmark"],
+  "[yaml]": {
+    "editor.formatOnSave": false
+  }
 }

@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  csv-diff-server:
+  - annotations:
+      category: CMS
+    apiVersion: v2
+    appVersion: 0.0.2
+    created: "2021-11-18T17:07:02.798816Z"
+    digest: 9efe2b0c801ef90d664acae60305e2cdbf9709a17d3008a254698390fd06c993
+    name: csv-diff-server
+    urls:
+    - packages/csv-diff-server-0.0.2.tgz
+    version: 0.0.2
+generated: "2021-11-18T17:07:02.796768Z"

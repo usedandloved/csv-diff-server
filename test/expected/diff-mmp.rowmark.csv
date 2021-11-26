@@ -1,21 +1,23 @@
-aw_deep_link,product_name,merchant_image_url,search_price_pennies
-https://www.awin1.com/pclick.php?p=26836898437222&a=537575&m=5792,Apple iPhone 13 64GB Purple Unlocked/Sim-Free Mobile Phone,https://musicmagpie.co.uk/store/spree/products/4679699/product/7903__Purple__1.jpg,43999
-https://www.awin1.com/pclick.php?p=26836898437225&a=537575&m=5792,Apple iPhone 14 64GB Purple Unlocked/Sim-Free Mobile Phone,https://musicmagpie.co.uk/store/spree/products/4679699/product/7903__Purple__1.jpg,43999
-aw_deep_link,product_name,merchant_image_url,search_price_pennies
-https://www.awin1.com/pclick.php?p=30395148021&a=537575&m=5792,GoPro Hero 5 Black Action Camera,https://musicmagpie.co.uk/store/spree/products/5379589/product/AI090000027763__Black__1.jpg,22999
-https://www.awin1.com/pclick.php?p=31124540711&a=537575&m=5792,Beats Studio 4 Wireless Camo Collection - Sand Dune Sound & Vision,https://musicmagpie.co.uk/store/spree/products/6106944/product/PI090000039671__Camo_Collection_-_Sand_Dune__1.jpeg,14499
-https://www.awin1.com/pclick.php?p=30957659005&a=537575&m=5792,"Apple MacBook Air Core i4 1.6 13"" True Tone 2019 16GB 128GB Silver Laptop",https://musicmagpie.co.uk/store/spree/products/6079895/product/UI090000026257__Silver__1.jpg,87999
-aw_deep_link,product_name,merchant_image_url,search_price_pennies
-https://www.awin1.com/pclick.php?p=27006172231&a=537575&m=5792,Apple iPad Pro 11 2020 Wi-Fi + 4G 1TB Silver Unlocked Tablet,https://musicmagpie.co.uk/store/spree/products/5541035/product/8088__Silver__1.jpg,91999
-https://www.awin1.com/pclick.php?p=26836878827&a=537575&m=5792,"Apple iPad Pro 10.5"" Smart Keyboard Tablet",https://musicmagpie.co.uk/store/spree/products/3631222/product/AI090000019105__Any__1.jpg,7498.999999999999
-https://www.awin1.com/pclick.php?p=27181596519&a=537575&m=5792,Apple Pencil 2nd Gen Tablet,https://musicmagpie.co.uk/store/spree/products/5307776/product/PI090000025786__Any__1.jpg,13499
-https://www.awin1.com/pclick.php?p=27136696227&a=537575&m=5792,Apple iPad Pencil Tablet,https://musicmagpie.co.uk/store/spree/products/5291961/product/PI090000015025__Any__1.jpg,10499
-https://www.awin1.com/pclick.php?p=26836876677&a=537575&m=5792,Apple iPad Mini 4 Wi-Fi 128GB Space Grey Tablet,https://musicmagpie.co.uk/store/spree/products/3077867/product/Image_1.jpg,24999
-https://www.awin1.com/pclick.php?p=26836876339&a=537575&m=5792,Apple iPad Air 2 Wi-Fi 16GB Gold Tablet,https://musicmagpie.co.uk/store/spree/products/3067338/product/Image_1.jpg,24499
-https://www.awin1.com/pclick.php?p=30483472855&a=537575&m=5792,"Apple iPad Magic Keyboard 12.9"" Tablet",https://musicmagpie.co.uk/store/spree/products/5782798/product/AI090000035802__Any__1.jpg,18499
-https://www.awin1.com/pclick.php?p=26836898009&a=537575&m=5792,"Apple iPad Pro 3 12.9"" 2018 Wi-Fi + 4G 1TB Space Grey Unlocked Tablet",https://musicmagpie.co.uk/store/spree/products/5278923/product/7714__Space_Grey__1.jpg,78499
-https://www.awin1.com/pclick.php?p=26836862617&a=537575&m=5792,"Apple iPad Pro 3 12.9"" 2018 Wi-Fi + 4G 512GB Space Grey Unlocked Tablet",https://musicmagpie.co.uk/store/spree/products/5278894/product/7714__Space_Grey__1.jpg,65499
-https://www.awin1.com/pclick.php?p=26836878739&a=537575&m=5792,Apple iPad Pro Pencil 1st Gen Tablet,https://musicmagpie.co.uk/store/spree/products/3920855/product/AI090000015025__Any__1.jpg,7498.999999999999
-https://www.awin1.com/pclick.php?p=26836898011&a=537575&m=5792,"Apple iPad Pro 3 12.9"" 2018 Wi-Fi + 4G 1TB Silver Unlocked Tablet",https://musicmagpie.co.uk/store/spree/products/5278695/product/7714__Silver__1.jpg,75999
-https://www.awin1.com/pclick.php?p=27006172375&a=537575&m=5792,Apple iPad Pro 11 2020 Wi-Fi + 4G 1TB Space Grey Unlocked Tablet,https://musicmagpie.co.uk/store/spree/products/5541202/product/8088__Space_Grey__1.jpg,84499
-https://www.awin1.com/pclick.php?p=26836894083&a=537575&m=5792,Apple iPad Pro 11 2018 Wi-Fi 256GB Space Grey Tablet,https://musicmagpie.co.uk/store/spree/products/5245480/product/7711__Space_Grey__1.jpg,59999
+aw_deep_link,product_name,merchant_image_url,search_price_pennies,ualId
+https://www.awin1.com/pclick.php?p=26836898437222&a=537575&m=5792,Apple iPhone 13 64GB Purple Unlocked/Sim-Free Mobile Phone,https://musicmagpie.co.uk/store/spree/products/4679699/product/7903__Purple__1.jpg,43999,mmp-ui000000026940
+https://www.awin1.com/pclick.php?p=26836898437225&a=537575&m=5792,Apple iPhone 14 64GB Purple Unlocked/Sim-Free Mobile Phone,https://musicmagpie.co.uk/store/spree/products/4679699/product/7903__Purple__1.jpg,43999,mmp-ui000000026940
+aw_deep_link,product_name,merchant_image_url,search_price_pennies,ualId
+https://www.awin1.com/pclick.php?p=27039770675&a=537575&m=5792,Apple AirPods Pro Earphones,https://musicmagpie.co.uk/store/spree/products/5255752/product/AI090000028006__White__1.jpg,16999,mmp-ai09 0000028006
+https://www.awin1.com/pclick.php?p=26836913665&a=537575&m=5792,Apple AirPods Pro Earphones,https://musicmagpie.co.uk/store/spree/products/5009753/product/UI090000028006__White__1.jpg,17999,mmp-ui090\000028006
+https://www.awin1.com/pclick.php?p=30395148021&a=537575&m=5792,GoPro Hero 5 Black Action Camera,https://musicmagpie.co.uk/store/spree/products/5379589/product/AI090000027763__Black__1.jpg,22999,mmp-ai090000027763
+https://www.awin1.com/pclick.php?p=31124540711&a=537575&m=5792,Beats Studio 4 Wireless Camo Collection - Sand Dune Sound & Vision,https://musicmagpie.co.uk/store/spree/products/6106944/product/PI090000039671__Camo_Collection_-_Sand_Dune__1.jpeg,14499,mmp-pi090000039671
+https://www.awin1.com/pclick.php?p=30957659005&a=537575&m=5792,"Apple MacBook Air Core i4 1.6 13"" True Tone 2019 16GB 128GB Silver Laptop",https://musicmagpie.co.uk/store/spree/products/6079895/product/UI090000026257__Silver__1.jpg,87999,mmp-ui090000026257
+aw_deep_link,product_name,merchant_image_url,search_price_pennies,ualId
+https://www.awin1.com/pclick.php?p=27006172375&a=537575&m=5792,Apple iPad Pro 11 2020 Wi-Fi + 4G 1TB Space Grey Unlocked Tablet,https://musicmagpie.co.uk/store/spree/products/5541202/product/8088__Space_Grey__1.jpg,84499,mmp-ui000000035360
+https://www.awin1.com/pclick.php?p=26836878827&a=537575&m=5792,"Apple iPad Pro 10.5"" Smart Keyboard Tablet",https://musicmagpie.co.uk/store/spree/products/3631222/product/AI090000019105__Any__1.jpg,7498.999999999999,mmp-ai090000019105
+https://www.awin1.com/pclick.php?p=26836876677&a=537575&m=5792,Apple iPad Mini 4 Wi-Fi 128GB Space Grey Tablet,https://musicmagpie.co.uk/store/spree/products/3077867/product/Image_1.jpg,24999,mmp-ai090000005719
+https://www.awin1.com/pclick.php?p=27136696227&a=537575&m=5792,Apple iPad Pencil Tablet,https://musicmagpie.co.uk/store/spree/products/5291961/product/PI090000015025__Any__1.jpg,10499,mmp-pi090000015025
+https://www.awin1.com/pclick.php?p=26836898011&a=537575&m=5792,"Apple iPad Pro 3 12.9"" 2018 Wi-Fi + 4G 1TB Silver Unlocked Tablet",https://musicmagpie.co.uk/store/spree/products/5278695/product/7714__Silver__1.jpg,75999,mmp-ui000000025037
+https://www.awin1.com/pclick.php?p=26836876339&a=537575&m=5792,Apple iPad Air 2 Wi-Fi 16GB Gold Tablet,https://musicmagpie.co.uk/store/spree/products/3067338/product/Image_1.jpg,24499,mmp-ai090000005272
+https://www.awin1.com/pclick.php?p=27006172231&a=537575&m=5792,Apple iPad Pro 11 2020 Wi-Fi + 4G 1TB Silver Unlocked Tablet,https://musicmagpie.co.uk/store/spree/products/5541035/product/8088__Silver__1.jpg,91999,mmp-pi000000035361
+https://www.awin1.com/pclick.php?p=26836862617&a=537575&m=5792,"Apple iPad Pro 3 12.9"" 2018 Wi-Fi + 4G 512GB Space Grey Unlocked Tablet",https://musicmagpie.co.uk/store/spree/products/5278894/product/7714__Space_Grey__1.jpg,65499,mmp-ai000000025033
+https://www.awin1.com/pclick.php?p=30483472855&a=537575&m=5792,"Apple iPad Magic Keyboard 12.9"" Tablet",https://musicmagpie.co.uk/store/spree/products/5782798/product/AI090000035802__Any__1.jpg,18499,mmp-ai090000035802
+https://www.awin1.com/pclick.php?p=26836898009&a=537575&m=5792,"Apple iPad Pro 3 12.9"" 2018 Wi-Fi + 4G 1TB Space Grey Unlocked Tablet",https://musicmagpie.co.uk/store/spree/products/5278923/product/7714__Space_Grey__1.jpg,78499,mmp-ui000000025036
+https://www.awin1.com/pclick.php?p=27181596519&a=537575&m=5792,Apple Pencil 2nd Gen Tablet,https://musicmagpie.co.uk/store/spree/products/5307776/product/PI090000025786__Any__1.jpg,13499,mmp-pi090000025786
+https://www.awin1.com/pclick.php?p=26836894083&a=537575&m=5792,Apple iPad Pro 11 2018 Wi-Fi 256GB Space Grey Tablet,https://musicmagpie.co.uk/store/spree/products/5245480/product/7711__Space_Grey__1.jpg,59999,mmp-pi090000025055
+https://www.awin1.com/pclick.php?p=26836878739&a=537575&m=5792,Apple iPad Pro Pencil 1st Gen Tablet,https://musicmagpie.co.uk/store/spree/products/3920855/product/AI090000015025__Any__1.jpg,7498.999999999999,mmp-ai090000015025

@@ -268,6 +268,8 @@ describe.only('Server diff 2 ', () => {
   }).timeout(15000);
 
   it('post : diff mmp', async () => {
+    const ualNetworkId = 'mmp';
+
     const body = {
       base: {
         dataset: 'mmp',
@@ -299,13 +301,19 @@ describe.only('Server diff 2 ', () => {
           "aw_deep_link" : aw_deep_link,
           "product_name" : product_name,
           "merchant_image_url" : merchant_image_url,
-          "search_price_pennies" : $number(search_price) * 100
+          "search_price_pennies" : $number(search_price) * 100,
+          "ualId" : $join([
+            '${ualNetworkId}-',
+            $lowercase(merchant_product_id)
+          ]) 
         }`,
       },
     };
     // One liner to make sure file is being served.
     expect((await fetch(body.base.source)).status).to.equal(200);
     expect((await fetch(body.delta.source)).status).to.equal(200);
+
+    // return;
 
     const apiResponse = await fetch(`${paths.url}/api/diff`, {
       method: 'post',
@@ -324,6 +332,8 @@ describe.only('Server diff 2 ', () => {
 
     // console.log(data);
 
+    // return;
+
     const expected = await fs.readFile(
       '/app/test/expected/diff-mmp.rowmark.csv'
     );
@@ -332,6 +342,8 @@ describe.only('Server diff 2 ', () => {
     for (const dist of apiJson.dists) {
       const distResponse = await fetch(dist.url);
       const distText = await distResponse.text();
+
+      // console.log(distText);
 
       for (const line of distText.split('\n')) {
         expect(`${expected}`.split('\n')).contains(line);

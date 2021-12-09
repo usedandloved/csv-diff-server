@@ -6,6 +6,7 @@ import { diffParamsSchema } from './schemas.js';
 
 import { paths, withUrls, isDistPathsIsMissing } from './lib/fs.js';
 import csvdiff, { processFlags } from './lib/csvdiff.js';
+import { logger } from './lib/logger.js';
 import { postProcess } from './lib/postProcess.js';
 import { objectHash, waitSeconds } from './lib/utils.js';
 
@@ -17,11 +18,11 @@ export default async (params, File, Diff, Dist, updateResponse) => {
   try {
     validResult = validator.validate(params);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 
   if (!validResult.valid) {
-    console.error('invalid params', validResult);
+    logger.error('invalid params', validResult);
     return {};
   }
 
@@ -38,18 +39,18 @@ export default async (params, File, Diff, Dist, updateResponse) => {
     ({ flagString, flagHash, flagHashShort, format, extension } =
       await processFlags(params.flags));
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 
   // if (isTimedOut) return result;
 
-  // console.log(params);
-  // console.log({ flagString, extension });
+  // logger.debug(params);
+  // logger.debug({ flagString, extension });
 
   try {
     base = await processSnapshot(File, params.base, params.preProcess);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 
   updateResponse({ base });
@@ -60,7 +61,7 @@ export default async (params, File, Diff, Dist, updateResponse) => {
     try {
       delta = await processSnapshot(File, params.delta, params.preProcess);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       params.delta = undefined;
       updateResponse({
         delta: 'aborted - could not find file and had no source',
@@ -71,7 +72,7 @@ export default async (params, File, Diff, Dist, updateResponse) => {
   if (params.delta) {
     updateResponse({ delta });
 
-    // console.log({ base, delta });
+    // logger.debug({ base, delta });
 
     diffPath = `${paths.data}/${base.file.dataset}`;
     if (base.file.dataset !== delta.file.dataset) {
@@ -115,13 +116,13 @@ export default async (params, File, Diff, Dist, updateResponse) => {
           format,
         });
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
 
       try {
         diff = await Diff.GetByFileIdsHashFormat(diffUniqueProps);
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
     }
 
@@ -146,30 +147,30 @@ export default async (params, File, Diff, Dist, updateResponse) => {
         postProcessHash,
       });
     } else {
-      // console.log('hi');
-      // console.log(base.file.id);
-      // console.log(postProcessHash);
+      // logger.debug('hi');
+      // logger.debug(base.file.id);
+      // logger.debug(postProcessHash);
       try {
         dists = Dist.GetByFileIdPostProcessHash({
           fileId: base.file.id,
           postProcessHash,
         });
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
     }
 
-    // console.log({ dists });
+    // logger.debug({ dists });
     // return;
 
     if (dists.length && (await isDistPathsIsMissing(dists))) {
-      console.error('a dist path is missing. Will re-do');
+      logger.error('a dist path is missing. Will re-do');
       Dist.DeleteMany(dists);
       dists = [];
     }
 
     if (!dists.length) {
-      // console.log('will make dists');
+      // logger.debug('will make dists');
       let target = {
         dir: `${diffPath}/dist`,
         extension,
@@ -188,10 +189,10 @@ export default async (params, File, Diff, Dist, updateResponse) => {
           }
         );
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
 
-      // console.log(dists);
+      // logger.debug(dists);
 
       dists = dists.map((obj) => ({
         ...obj,
@@ -203,7 +204,7 @@ export default async (params, File, Diff, Dist, updateResponse) => {
       try {
         Dist.CreateMany(dists);
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
     }
   }

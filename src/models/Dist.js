@@ -1,3 +1,5 @@
+import { logger } from '../lib/logger.js';
+
 const getDist = async (db) => {
   // return { Create: '' };
 
@@ -49,39 +51,39 @@ const getDist = async (db) => {
 
   return {
     Create: (params) => {
-      // console.log('creating dist', params);
+      // logger.debug('creating dist', params);
       return insert.run(params);
     },
     CreateMany: (dists) => {
-      // console.log('creating dist', params);
+      // logger.debug('creating dist', params);
       return insertMany(dists);
     },
     GetByDiffIdPostProcessHash: (params) => {
-      // console.log(params);
+      // logger.debug(params);
       return getByDiffIdPostProcessHash.all(params);
     },
     GetByFileIdPostProcessHash: (params) => {
-      // console.log(params);
+      // logger.debug(params);
       return getByFileIdPostProcessHash.all(params);
     },
     GetAll: () => {
-      console.log('get all dists');
+      logger.debug('get all dists');
       return getAll.all();
     },
     DeleteMany: (dists) => {
-      // console.log('creating dist', params);
+      // logger.debug('creating dist', params);
       return deleteMany(dists);
     },
     DeleteByDiffId: (params) => {
-      // console.log('deleting csv', params);
+      // logger.debug('deleting csv', params);
       return deleteByDiffId.run(params);
     },
     // Delete: (params) => {
-    //   // console.log('deleting csv', params);
+    //   // logger.debug('deleting csv', params);
     //   return deleteOne.run(params);
     // },
     // DeleteAll: () => {
-    //   // console.log('deleting all csvs');
+    //   // logger.debug('deleting all csvs');
     //   return deleteAll.run();
     // },
   };

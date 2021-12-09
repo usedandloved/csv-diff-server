@@ -4,35 +4,37 @@ import { format } from '@fast-csv/format';
 import fs from 'fs-extra';
 import jsonata from 'jsonata';
 
+import { logger } from './logger.js';
+
 const validateRow = async (data, rowValidator) => {
   if (!rowValidator) return true;
-  // console.log(data);
+  // logger.debug(data);
   try {
-    // console.log(rowValidator?.validate(data)?.valid);
+    // logger.debug(rowValidator?.validate(data)?.valid);
     return rowValidator?.validate(data)?.valid || false;
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     return false;
   }
 };
 
 const processRow = async (row, transforms) => {
-  // console.log({ transforms });
-  // console.log(JSON.stringify(row));
+  // logger.debug({ transforms });
+  // logger.debug(JSON.stringify(row));
   try {
     var expression = jsonata(transforms);
     var result = expression.evaluate(row); // returns 24
 
-    // console.log(result);
+    // logger.debug(result);
     return result;
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
   return row;
 };
 
 const postProcess = async (diff, options, target, updatePercentage) => {
-  // console.log({ diff, options, target });
+  // logger.debug({ diff, options, target });
 
   const { lineCount: lineCount } = diff,
     { batchSize = 50000, transforms } = options,
@@ -87,7 +89,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
       // Make csvStreams for possibleDiffStates
       makeCsvStreamPromises.push(makeCsvStream(diffState, 0));
     } catch (e) {
-      console.log(e);
+      logger.debug(e);
     }
   }
   await Promise.all(makeCsvStreamPromises);
@@ -96,7 +98,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
     csvParseResult = await new Promise((resolve, reject) => {
       fs.createReadStream(diff.path)
         .on('error', (error) => {
-          console.log(error);
+          logger.debug(error);
           // In-case file doesn't exist
           reject(error);
         })
@@ -108,7 +110,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
                 // TODO: add a filter for writerHeaders
                 // Otherwise, dist csv could have many un-used headers.
                 if (!writerHeaders) writerHeaders = Object.values(headers);
-                // console.log({ headers });
+                // logger.debug({ headers });
                 return headers;
               },
             })
@@ -134,7 +136,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
           //   options
           // );
 
-          // console.log({ row });
+          // logger.debug({ row });
 
           rowCount.total++;
 
@@ -145,7 +147,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
 
           const processedRow = await processedRowPromise;
 
-          // console.log(processedRow);
+          // logger.debug(processedRow);
 
           if (!processedRow) return;
 
@@ -155,7 +157,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
 
           const index = Math.floor(thisValidRows / batchSize);
 
-          // console.log(index);
+          // logger.debug(index);
 
           if (thisValidRows % batchSize === 0 && thisValidRows > 0) {
             // Set the end time of the previous batch
@@ -175,7 +177,7 @@ const postProcess = async (diff, options, target, updatePercentage) => {
           );
         })
         .on('end', async () => {
-          // console.log(dataPromises);
+          // logger.debug(dataPromises);
           // await Promise.all(dataPromises);
           await Promise.all(writePromises);
 
@@ -211,13 +213,13 @@ const postProcess = async (diff, options, target, updatePercentage) => {
     });
   } catch (error) {
     // Handle rejection here
-    console.error(error);
+    logger.error(error);
     throw error;
   }
 
   updatePercentage(100);
 
-  // console.log(csvParseResult);
+  // logger.debug(csvParseResult);
 
   return csvParseResult;
 };

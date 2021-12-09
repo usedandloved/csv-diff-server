@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs-extra';
 
+import { logger } from './logger.js';
 import { objectHash } from './utils.js';
 
 export default async ({ base, delta, flagString, target }) => {
@@ -29,10 +30,10 @@ export default async ({ base, delta, flagString, target }) => {
       // Copy the first line
       // Then run csvdiff and pipe output to target file.
 
-      // console.log(`${base} ${delta} ${flagString}`);
+      // logger.debug(`${base} ${delta} ${flagString}`);
       const csvdiffCommand = `csvdiff ${base} ${delta} ${flagString}`;
 
-      // console.log(csvdiffCommand);
+      // logger.debug(csvdiffCommand);
 
       const script = exec(
         ` 
@@ -43,7 +44,7 @@ export default async ({ base, delta, flagString, target }) => {
       );
 
       script.stdout.on('data', (data) => {
-        // console.log(data);
+        // logger.debug(data);
         if (data.match(/killed/)?.length) {
           reject(new Error('csvdiff got killed response'));
         }
@@ -58,13 +59,13 @@ export default async ({ base, delta, flagString, target }) => {
           reject(new Error('csvdiff got killed response'));
         }
 
-        // console.log(data);
+        // logger.debug(data);
 
         const timeMatch = data.match(
           /^csvdiff took ((\d+)m)*((\d+.\d+)s)*((\d+.\d+)ms)*/
         );
 
-        // console.log({ timeMatch });
+        // logger.debug({ timeMatch });
 
         if (timeMatch?.[2] || timeMatch?.[4] || timeMatch?.[6]) {
           csvdiffConsole.time = 0;
@@ -79,7 +80,7 @@ export default async ({ base, delta, flagString, target }) => {
           }
           csvdiffConsole.time = parseInt(csvdiffConsole.time);
           // Integer of time in microseconds
-          // console.log(csvdiffConsole.time);
+          // logger.debug(csvdiffConsole.time);
           return;
         }
 
@@ -97,12 +98,12 @@ export default async ({ base, delta, flagString, target }) => {
       script.on('close', (c, s) => {
         if (0 === c)
           return resolve({ lineCount, path: target, ...csvdiffConsole });
-        console.error(`child process exited w/ code ${c} & signal ${s}`);
+        logger.error(`child process exited w/ code ${c} & signal ${s}`);
         return reject(new Error(stderr));
       });
     });
   } catch (e) {
-    return console.error(e);
+    return logger.error(e);
   }
   return diffResult;
 };
@@ -120,7 +121,7 @@ const processFlags = async (flags) => {
   let stringArray = [],
     extensionArray = [];
   for (const [key, value] of Object.entries(ordered)) {
-    // console.log(`${key}: ${value}`);
+    // logger.debug(`${key}: ${value}`);
     if (['lazyquotes', 'time'].includes(key) && value) {
       stringArray.push(`--${key}`);
     } else {
@@ -131,7 +132,7 @@ const processFlags = async (flags) => {
   let { format = 'diff', ...flagsWithoutFormat } = ordered;
 
   const json = JSON.stringify(flagsWithoutFormat);
-  // console.log(json);
+  // logger.debug(json);
   const hash = Object.keys(flagsWithoutFormat).length
     ? objectHash(flagsWithoutFormat)
     : '';

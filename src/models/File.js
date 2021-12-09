@@ -1,3 +1,5 @@
+import { logger } from '../lib/logger.js';
+
 const getFile = async (db) => {
   // return { Create: '' };
 
@@ -28,36 +30,36 @@ const getFile = async (db) => {
 
   return {
     Create: (params) => {
-      // console.log('creating csv', params);
+      // logger.debug('creating csv', params);
       return insert.run(params);
     },
 
     GetOne: (params) => {
-      // console.log('get all csv');
+      // logger.debug('get all csv');
       return get.get(params);
     },
     GetByDatasetRevision: (params) => {
-      // console.log(params);
+      // logger.debug(params);
       return getByDatasetRevision.get(params);
     },
     GetAll: () => {
-      // console.log('get all csv');
+      // logger.debug('get all csv');
       return getAll.all();
     },
     Update: (params) => {
-      // console.log('creating csv', params);
+      // logger.debug('creating csv', params);
       return update.run(params);
     },
     UpdateByDatasetRevision: (params) => {
-      // console.log('creating csv', params);
+      // logger.debug('creating csv', params);
       return updateByDatasetRevision.run(params);
     },
     Delete: (params) => {
-      // console.log('deleting csv', params);
+      // logger.debug('deleting csv', params);
       return deleteOne.run(params);
     },
     DeleteAll: () => {
-      // console.log('deleting all csvs');
+      // logger.debug('deleting all csvs');
       return deleteAll.run();
     },
   };

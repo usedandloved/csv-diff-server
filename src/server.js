@@ -5,6 +5,7 @@ import { getDiff } from './models/Diff.js';
 import { getDist } from './models/Dist.js';
 import main from './main.js';
 import { paths, withUrls } from './lib/fs.js';
+import { logger } from './lib/logger.js';
 import { msToTime, waitSeconds, objectHash } from './lib/utils.js';
 import { withMemStore } from './lib/withMemStore.js';
 
@@ -18,10 +19,10 @@ const port = process.env.PORT || 3000,
  */
 process.stdin.resume();
 async function exitHandler(options, exitCode) {
-  console.log('In exitHandler');
+  logger.debug('In exitHandler');
   await server?.close();
   await db?.close();
-  if (exitCode || exitCode === 0) console.log(exitCode);
+  if (exitCode || exitCode === 0) logger.debug(exitCode);
   if (options.exit) process.exit();
 }
 process.on('SIGINT', exitHandler.bind(null, { exit: true }));
@@ -34,7 +35,7 @@ const getServer = async ({ databaseOptions } = {}) => {
   try {
     db = await getDb(databaseOptions);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     throw e;
   }
 
@@ -53,7 +54,7 @@ const getServer = async ({ databaseOptions } = {}) => {
   app.use(express.json());
 
   // app.close = async () => {
-  //   console.log("Gracefully stopping server and database");
+  //   logger.debug("Gracefully stopping server and database");
 
   // };
 
@@ -63,17 +64,17 @@ const getServer = async ({ databaseOptions } = {}) => {
     try {
       files = (await File.GetAll()) || [];
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
     try {
       diffs = withUrls(await Diff.GetAll()) || [];
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
     try {
       dists = withUrls(await Dist.GetAll()) || [];
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
     res.render('pages/index.ejs', { files, diffs, dists });
   });
@@ -85,7 +86,7 @@ const getServer = async ({ databaseOptions } = {}) => {
     try {
       result = (await File.GetAll()) || [];
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       return res.json({ error: true });
     }
     res.json(result);
@@ -96,18 +97,18 @@ const getServer = async ({ databaseOptions } = {}) => {
     try {
       result = File.GetOne({ path: req.params.path }) || {};
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       return res.json({ error: true });
     }
     res.json(result);
   });
 
   app.post('/api/file', (req, res, next) => {
-    console.log(req.body);
+    logger.debug(req.body);
     // try {
     //   result = File.GetOne({ path: req.params.path }) || {};
     // } catch (e) {
-    //   console.error(e);
+    //   logger.error(e);
     //   return res.json({ error: true });
     // }
     // 0. Is file already cached? Get from database.
@@ -119,7 +120,7 @@ const getServer = async ({ databaseOptions } = {}) => {
     // try {
     //   result = File.GetOne({ path: req.params.path }) || {};
     // } catch (e) {
-    //   console.error(e);
+    //   logger.error(e);
     //   return res.json({ error: true });
     // }
     // res.json(result);
@@ -132,11 +133,11 @@ const getServer = async ({ databaseOptions } = {}) => {
     );
 
     if (value && Object.values(value).find((x) => x?.progress)) {
-      console.log('response from memStore');
+      logger.debug('response from memStore');
       return res.send(value);
     }
 
-    console.log('will run main');
+    logger.debug('will run main');
 
     try {
       promises = [
@@ -146,7 +147,7 @@ const getServer = async ({ databaseOptions } = {}) => {
         ),
       ];
     } catch (e) {
-      console.log(e);
+      logger.debug(e);
     }
 
     res.send(await Promise.any(promises));
@@ -167,11 +168,11 @@ const getServer = async ({ databaseOptions } = {}) => {
   try {
     server = app.listen(port, () => {
       if ('test' !== process.env.APP_ENV) {
-        console.log(`Server running on port ${port}`);
+        logger.debug(`Server running on port ${port}`);
       }
     });
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 
   app.close = async () => {

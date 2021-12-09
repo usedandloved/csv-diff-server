@@ -2,18 +2,20 @@ import Database from 'better-sqlite3';
 import fs from 'fs-extra';
 import path from 'path';
 
+import { logger } from './lib/logger.js';
+
 const getDb = async ({ target = 'data/default.db' } = {}) => {
   let db, tableNames;
 
   await fs.ensureDir(path.dirname(target));
 
-  // console.log({ target });
+  // logger.debug({ target });
 
   try {
-    // db = new Database(path, { verbose: console.log });
+    // db = new Database(path, { verbose: logger.debug });
     db = new Database(target);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     throw e;
   }
 
@@ -26,7 +28,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     const tables = stmt.all();
     tableNames = tables.map((table) => table.name);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 
   if (!tableNames.includes('file')) {
@@ -44,7 +46,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     )`);
       stmt.run();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   }
 
@@ -71,7 +73,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     )`);
       stmt.run();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   }
 
@@ -92,7 +94,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     )`);
       stmt.run();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   }
 
@@ -111,7 +113,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
   //       { name: 'mmp-books', path: '/tmp/mmp-books' },
   //     ]);
   //   } catch (e) {
-  //     console.error(e);
+  //     logger.error(e);
   //   }
   // }
 

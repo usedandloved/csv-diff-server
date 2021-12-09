@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "csv-diff-server.fullname" . }}
+  labels:
+    {{- include "csv-diff-server.labels" . | nindent 4 }} 
+    app: {{ include "csv-diff-server.fullname" . }}
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ include "csv-diff-server.fullname" . }}
+  endpoints:
+    - targetPort: {{ .Values.service.port }}

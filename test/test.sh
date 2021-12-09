@@ -19,8 +19,9 @@ docker run -d --rm -t \
   --name "${CONTAINER_NAME}" \
   -v=$SCRIPT_DIR/../:/app \
   -v=csv_diff_server_node_modules:/app/node_modules \
-  --env-file=$SCRIPT_DIR/.env \
   -e APP_ENV=test \
+  -e PATHS_URL=http://localhost:3001 \
+  -e PORT=3001 \
   -w=/app \
   -p3001:3001 \
   --entrypoint /bin/ash \

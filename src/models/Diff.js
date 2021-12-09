@@ -1,3 +1,5 @@
+import { logger } from '../lib/logger.js';
+
 const getDiff = async (db) => {
   // return { Create: '' };
 
@@ -45,7 +47,7 @@ const getDiff = async (db) => {
 
   return {
     Create: (params) => {
-      // console.log('creating diff', params);
+      // logger.debug('creating diff', params);
       if (!params.time) params.time = null;
       if (!Number.isInteger(params.additions)) params.additions = null;
       if (!Number.isInteger(params.modifications)) params.modifications = null;
@@ -53,23 +55,23 @@ const getDiff = async (db) => {
       return insert.run(params);
     },
     GetByFileIdsHashFormat: (params) => {
-      // console.log(params);
+      // logger.debug(params);
       return getByFileIdsHashFormat.get(params);
     },
     GetAll: () => {
-      console.log('get all diffs');
+      logger.debug('get all diffs');
       return getAll.all();
     },
     DeleteByFileIdsHashFormat: (params) => {
-      // console.log(params);
+      // logger.debug(params);
       return deleteByFileIdsHashFormat.run(params);
     },
     // Delete: (params) => {
-    //   // console.log('deleting csv', params);
+    //   // logger.debug('deleting csv', params);
     //   return deleteOne.run(params);
     // },
     // DeleteAll: () => {
-    //   // console.log('deleting all csvs');
+    //   // logger.debug('deleting all csvs');
     //   return deleteAll.run();
     // },
   };

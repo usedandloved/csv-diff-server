@@ -3,6 +3,8 @@ import fetch from 'node-fetch';
 import path from 'path';
 import zlib from 'zlib';
 
+import { logger } from './logger.js';
+
 const paths = {
   url: process.env.PATHS_URL?.replace(/\/$/, '') || '',
   data: process.env.PATHS_DIFF || `/tmp/data`,
@@ -16,7 +18,7 @@ const withUrls = (data) => {
     }
   };
 
-  // console.log(data);
+  // logger.debug(data);
 
   if (Array.isArray(data)) {
     data.forEach((object) => {
@@ -42,7 +44,7 @@ const downloadFile = async (source, target, options = {}) => {
 
         if (options.fileHeaders)
           dest.write(options.fileHeaders.join(',') + '\n');
-        // console.log(res.headers.raw());
+        // logger.debug(res.headers.raw());
 
         if ('application/gzip' === res.headers.get('content-type')) {
           res.body.pipe(zlib.createGunzip()).pipe(dest);
@@ -56,8 +58,8 @@ const downloadFile = async (source, target, options = {}) => {
 };
 
 const isDistPathsIsMissing = async (dists) => {
-  console.log('in isDistPathsIsMissing');
-  // console.log(dists);
+  logger.debug('in isDistPathsIsMissing');
+  // logger.debug(dists);
   const promises = [];
   for (const dist of dists) {
     promises.push(fs.pathExists(dist.path));

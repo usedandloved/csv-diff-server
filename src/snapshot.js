@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 
 import { downloadFile, paths } from './lib/fs.js';
+import { logger } from './lib/logger.js';
 
 const processSnapshot = async (
   File,
@@ -10,7 +11,7 @@ const processSnapshot = async (
   let file;
   const done = [];
 
-  // console.log({ headers });
+  // logger.debug({ headers });
 
   if (!dataset) dataset = 'default';
 
@@ -34,7 +35,7 @@ const processSnapshot = async (
         revision,
       });
     } catch (e) {
-      console.error(e);
+      logger.error(e);
 
       throw e;
     }
@@ -43,7 +44,7 @@ const processSnapshot = async (
 
   // Does dbFile.source match source?
   if (file.source && source && file.source !== source) {
-    console.warn(
+    logger.warn(
       'a different source was previously used for for this dataset and revision'
     );
   }
@@ -57,14 +58,14 @@ const processSnapshot = async (
     try {
       file.path = await downloadFile(source, target, { fileHeaders: headers });
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       throw e;
     }
 
     try {
       await File.UpdateByDatasetRevision(file);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       throw e;
     }
     done.push('downloaded');

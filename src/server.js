@@ -140,11 +140,11 @@ const getServer = async ({ databaseOptions } = {}) => {
     );
 
     if (value && Object.values(value).find((x) => x?.progress)) {
-      logger.debug('response from memStore');
+      // logger.debug('response from memStore');
       return res.send(value);
     }
 
-    logger.debug('will run main');
+    logger.debug('will run main - response not from memStore');
 
     try {
       promises = [

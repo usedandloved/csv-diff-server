@@ -79,10 +79,10 @@ const getServer = async ({ databaseOptions } = {}) => {
     res.render('pages/index.ejs', { files, diffs, dists });
   });
 
-  app.get('/liveness', (res) => {
+  app.get('/liveness', (req, res) => {
     res.json({ status: 'UP' });
   });
-  app.get('/readiness', (res) => {
+  app.get('/readiness', (req, res) => {
     res.json({ status: 'UP' });
   });
 

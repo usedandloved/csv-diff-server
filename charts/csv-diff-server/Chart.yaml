@@ -3,5 +3,5 @@ annotations:
 apiVersion: v2
 # engine: gotpl
 name: csv-diff-server
-version: 0.0.6
-appVersion: 0.0.6
+version: 0.0.7
+appVersion: 0.0.7

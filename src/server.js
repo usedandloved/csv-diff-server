@@ -79,6 +79,13 @@ const getServer = async ({ databaseOptions } = {}) => {
     res.render('pages/index.ejs', { files, diffs, dists });
   });
 
+  app.get('/liveness', (res) => {
+    res.json({ status: 'UP' });
+  });
+  app.get('/readiness', (res) => {
+    res.json({ status: 'UP' });
+  });
+
   // Insert here other API endpoints
 
   app.get('/api/files', async (req, res, next) => {

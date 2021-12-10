@@ -52,11 +52,11 @@ spec:
           # TODO: improve these
           livenessProbe:
             httpGet:
-              path: /
+              path: /liveness
               port: 3000
           readinessProbe:
             httpGet:
-              path: /
+              path: /readiness
               port: 3000
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

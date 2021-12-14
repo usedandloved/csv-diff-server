@@ -65,7 +65,55 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   const app = express();
 
+  /*
+   * Prometheus
+   */
+
   app.use(metricsMiddleware);
+
+  new promClient.Gauge({
+    name: `csv_diff_sizes_file`,
+    help: 'metric_help',
+    async collect() {
+      let fileTotals;
+      try {
+        fileTotals = await File.GetTotals();
+      } catch (e) {
+        logger.error(e);
+      }
+      this.set(fileTotals?.[0]?.size || 0);
+    },
+  });
+  new promClient.Gauge({
+    name: `csv_diff_sizes_diff`,
+    help: 'metric_help',
+    async collect() {
+      let diffTotals;
+      try {
+        diffTotals = await Diff.GetTotals();
+      } catch (e) {
+        logger.error(e);
+      }
+      this.set(diffTotals?.[0]?.size || 0);
+    },
+  });
+  new promClient.Gauge({
+    name: `csv_diff_sizes_dist`,
+    help: 'metric_help',
+    async collect() {
+      let distTotals;
+      try {
+        distTotals = await Dist.GetTotals();
+      } catch (e) {
+        logger.error(e);
+      }
+      this.set(distTotals?.[0]?.size || 0);
+    },
+  });
+
+  /*
+   * Views
+   */
 
   app.set('views', '/app/src/views');
 
@@ -80,25 +128,32 @@ const getServer = async ({ databaseOptions } = {}) => {
 
   // };
 
+  /*
+   * Endpoints
+   */
+
   // index page
   app.get('/', async (req, res) => {
-    let files, diffs, dists;
+    let files, fileTotals, diffs, diffTotals, dists, distTotals;
     try {
       files = (await File.GetAll()) || [];
-    } catch (e) {
-      logger.error(e);
-    }
-    try {
+      fileTotals = (await File.GetTotals())[0] || [];
       diffs = withUrls(await Diff.GetAll()) || [];
-    } catch (e) {
-      logger.error(e);
-    }
-    try {
+      diffTotals = (await Diff.GetTotals())[0] || [];
       dists = withUrls(await Dist.GetAll()) || [];
+      distTotals = (await Dist.GetTotals())[0] || [];
     } catch (e) {
       logger.error(e);
     }
-    res.render('pages/index.ejs', { files, diffs, dists });
+
+    res.render('pages/index.ejs', {
+      files,
+      fileTotals,
+      diffs,
+      diffTotals,
+      dists,
+      distTotals,
+    });
   });
 
   app.get('/liveness', (req, res) => {

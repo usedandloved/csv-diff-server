@@ -31,6 +31,8 @@ const getDiff = async (db) => {
 
   const getAll = db.prepare('SELECT * FROM diff');
 
+  const getTotals = db.prepare('SELECT SUM(size) as size FROM diff');
+
   const deleteByFileIdsHashFormat = db.prepare(
     `
     DELETE FROM diff 
@@ -61,6 +63,9 @@ const getDiff = async (db) => {
     GetAll: () => {
       logger.debug('get all diffs');
       return getAll.all();
+    },
+    GetTotals: () => {
+      return getTotals.all();
     },
     DeleteByFileIdsHashFormat: (params) => {
       // logger.debug(params);

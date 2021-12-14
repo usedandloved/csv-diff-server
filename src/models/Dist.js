@@ -37,6 +37,8 @@ const getDist = async (db) => {
 
   const getAll = db.prepare('SELECT * FROM dist');
 
+  const getTotals = db.prepare('SELECT SUM(size) as size FROM dist');
+
   const deleteMany = db.transaction((dists) => {
     for (const dist of dists) deleteOne.run({ id: dist.id });
   });
@@ -69,6 +71,9 @@ const getDist = async (db) => {
     GetAll: () => {
       logger.debug('get all dists');
       return getAll.all();
+    },
+    GetTotals: () => {
+      return getTotals.all();
     },
     DeleteMany: (dists) => {
       // logger.debug('creating dist', params);

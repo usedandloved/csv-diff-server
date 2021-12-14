@@ -50,7 +50,18 @@
           </tr>
           <% }); %>
         </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><pre><%= (fileTotals.size / 1024000).toFixed(1) %></pre></td>
+            <td></td>
+          </tr>
+        </tfoot>
       </table>
+      
       <h3>Diffs</h3>
       <table>
         <thead>
@@ -83,6 +94,18 @@
           </tr>
           <% }); %>
         </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><pre><%= (diffTotals.size / 1024000).toFixed(1) %></pre></td>
+            <td></td>
+          </tr>
+        </tfoot>
       </table>
       <h3>Dists</h3>
       <table>
@@ -112,6 +135,17 @@
           </tr>
           <% }); %>
         </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><pre><%= (distTotals.size / 1024000).toFixed(1) %></pre></td>
+            <td></td>
+          </tr>
+        </tfoot>
       </table>
     </main>
 

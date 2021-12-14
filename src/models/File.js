@@ -15,6 +15,8 @@ const getFile = async (db) => {
 
   const getAll = db.prepare('SELECT * FROM file');
 
+  const getTotals = db.prepare('SELECT SUM(size) as size FROM file');
+
   const update = db.prepare(
     'UPDATE file SET revision = (@revision) WHERE path = (@path)'
   );
@@ -46,6 +48,10 @@ const getFile = async (db) => {
     GetAll: () => {
       // logger.debug('get all csv');
       return getAll.all();
+    },
+    GetTotals: () => {
+      // logger.debug('get all csv');
+      return getTotals.all();
     },
     Update: (params) => {
       // logger.debug('creating csv', params);

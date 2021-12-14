@@ -1,4 +1,7 @@
 import express from 'express';
+import promClient from 'prom-client';
+import promBundle from 'express-prom-bundle';
+
 import { getDb } from './database.js';
 import { getFile } from './models/File.js';
 import { getDiff } from './models/Diff.js';
@@ -30,6 +33,23 @@ process.on('SIGUSR1', exitHandler.bind(null, { exit: true }));
 process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
 // process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
 
+/*
+ * Prometheus
+ */
+
+const metricsMiddleware = promBundle({
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+  includeUp: true,
+  customLabels: {
+    project_name: 'csv-diff-server',
+  },
+  promClient: {
+    collectDefaultMetrics: {},
+  },
+});
+
 const getServer = async ({ databaseOptions } = {}) => {
   let db;
   try {
@@ -44,6 +64,8 @@ const getServer = async ({ databaseOptions } = {}) => {
   const Dist = await getDist(db);
 
   const app = express();
+
+  app.use(metricsMiddleware);
 
   app.set('views', '/app/src/views');
 

@@ -12,6 +12,16 @@
         <p>Welcome to templating using EJS</p>
       </div> -->
 
+      <style>
+        th,
+        td {
+          padding: 3px;
+        }
+        pre {
+          margin-bottom: 0;
+        }
+      </style>
+
       <h3>Snapshots</h3>
       <table>
         <thead>
@@ -20,17 +30,23 @@
             <th>Dataset</th>
             <th>Revision</th>
             <th>Source</th>
+            <th>Size MB</th>
             <th>Created at</th>
           </tr>
         </thead>
         <tbody>
           <% files.forEach(function(file) { %>
           <tr>
-            <td><%= file.id %></td>
-            <td><%= file.dataset %></td>
-            <td><%= file.revision %></td>
-            <td><%= file.source %></td>
-            <td><%= file.createdAt %></td>
+            <td><pre><%= file.id %></pre></td>
+            <td><pre><%= file.dataset %></pre></td>
+            <td><pre><%= file.revision %></pre></td>
+            <td>
+              <a href="<%= file.source %>">
+                <pre><%= file.source.substring(0, 50) %>... </pre>
+              </a>
+            </td>
+            <td><pre><%= (file.size / 1024000).toFixed(1) %></pre></td>
+            <td><pre><%= file.createdAt %></pre></td>
           </tr>
           <% }); %>
         </tbody>
@@ -45,22 +61,25 @@
             <th>Path</th>
             <th>Url</th>
             <th>Time</th>
-
+            <th>Size MB</th>
             <th>Created at</th>
           </tr>
         </thead>
         <tbody>
           <% diffs.forEach(function(diff) { %>
           <tr>
-            <td><%= diff.id %></td>
-            <td><%= diff.baseFileId %></td>
-            <td><%= diff.deltaFileId %></td>
-            <td><%= diff.path %></td>
+            <td><pre><%= diff.id %></pre></td>
+            <td><pre><%= diff.baseFileId %></pre></td>
+            <td><pre><%= diff.deltaFileId %></pre></td>
+            <td><pre><%= diff.path.substring(0, 20) %>...</pre></td>
             <td>
-              <a href="<%= diff.url %>"><%= diff.url %></a>
+              <a href="<%= diff.url %>">
+                <pre><%= diff.url.substring(0, 20) %>...</pre>
+              </a>
             </td>
-            <td><%= msToTime(diff.time) %></td>
-            <td><%= diff.createdAt %></td>
+            <td><pre><%= msToTime(diff.time) %></pre></td>
+            <td><pre><%= (diff.size / 1024000).toFixed(1) %></pre></td>
+            <td><pre><%= diff.createdAt %></pre></td>
           </tr>
           <% }); %>
         </tbody>
@@ -74,20 +93,22 @@
             <th>Path</th>
             <th>Url</th>
             <th>Time</th>
+            <th>Size MB</th>
             <th>Created at</th>
           </tr>
         </thead>
         <tbody>
           <% dists.forEach(function(dist) { %>
           <tr>
-            <td><%= dist.id %></td>
-            <td><%= dist.diffId %></td>
-            <td><%= dist.path %></td>
+            <td><pre><%= dist.id %></td></pre>
+            <td><pre><%= dist.diffId %></td></pre>
+            <td><pre><%= dist.path.substring(0, 20) %>...</td></pre>
             <td>
-              <a href="<%= dist.url %>"><%= dist.url %></a>
+              <a href="<%= dist.url %>"><pre><%= dist.url.substring(0, 20) %>...</pre></a>
             </td>
-            <td><%= msToTime(dist.time) %></td>
-            <td><%= dist.createdAt %></td>
+            <td><pre><%= msToTime(dist.time) %></td></pre>
+            <td><pre><%= (dist.size / 1024000).toFixed(1) %></td></pre>
+            <td><pre><%= dist.createdAt %></td></pre>
           </tr>
           <% }); %>
         </tbody>

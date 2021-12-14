@@ -107,6 +107,8 @@ export default async (params, File, Diff, Dist, updateResponse) => {
         target: diffTarget,
       });
 
+      const { size } = fs.statSync(diffTarget);
+
       try {
         await Diff.Create({
           baseFileId: base.file.id,
@@ -114,6 +116,7 @@ export default async (params, File, Diff, Dist, updateResponse) => {
           ...diffResult,
           flagHash,
           format,
+          size,
         });
       } catch (e) {
         logger.error(e);
@@ -194,12 +197,16 @@ export default async (params, File, Diff, Dist, updateResponse) => {
 
       // logger.debug(dists);
 
-      dists = dists.map((obj) => ({
-        ...obj,
-        diffId: diff.id,
-        fileId: diff.id ? null : base.file.id,
-        postProcessHash,
-      }));
+      dists = dists.map((obj) => {
+        const { size } = fs.statSync(obj.path);
+        return {
+          ...obj,
+          diffId: diff.id,
+          fileId: diff.id ? null : base.file.id,
+          postProcessHash,
+          size: size,
+        };
+      });
 
       try {
         Dist.CreateMany(dists);

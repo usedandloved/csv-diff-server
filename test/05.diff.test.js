@@ -12,6 +12,7 @@ import {
   postDiffSmallResponse,
 } from './expected/index.js';
 import { waitSeconds } from '../src/lib/utils.js';
+import { logger } from '../src/lib/logger.js';
 
 chai.use(chaiExclude);
 chai.use(deepEqualInAnyOrder);
@@ -241,6 +242,7 @@ describe.only('Server diff 2 ', () => {
         'createdAt',
         'time',
         'diffId',
+        'size',
       ])
       .to.deep.equal(postDiffSmallResponse({ body }));
 
@@ -325,7 +327,10 @@ describe.only('Server diff 2 ', () => {
 
     const apiJson = await apiResponse.json();
 
-    // console.log(apiJson);
+    // logger.debug(apiJson);
+    // console.log(apiJson.diff.url);
+
+    // return;
 
     const dataResponse = await fetch(apiJson.diff.url);
     const data = await dataResponse.text();

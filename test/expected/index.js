@@ -5,6 +5,7 @@ const postDiffTestResponse = ({ body }) => ({
     file: {
       ...body.base,
       path: `${paths.data}/sample/snapshots/v1.csv`,
+      size: 11,
     },
     done: ['created', 'downloaded'],
   },
@@ -12,6 +13,7 @@ const postDiffTestResponse = ({ body }) => ({
     file: {
       ...body.delta,
       path: `${paths.data}/sample/snapshots/v2.csv`,
+      size: 12,
     },
     done: ['created', 'downloaded'],
   },
@@ -24,6 +26,7 @@ const postDiffTestResponse = ({ body }) => ({
     additions: 0,
     modifications: 1,
     deletions: 0,
+    size: 36,
   },
   dists: [
     {
@@ -32,6 +35,7 @@ const postDiffTestResponse = ({ body }) => ({
       diffState: 'modified',
       postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
       url: 'http://localhost:3001/data/sample/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
+      size: 19,
     },
   ],
 });

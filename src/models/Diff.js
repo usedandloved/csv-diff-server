@@ -6,12 +6,12 @@ const getDiff = async (db) => {
   const insert = db.prepare(
     ` 
     INSERT INTO diff 
-      ( baseFileId, deltaFileId, path,
+      ( baseFileId, deltaFileId, path, size,
         flagHash, format, lineCount, time,
         additions, modifications, deletions
       ) 
     VALUES
-      ( @baseFileId, @deltaFileId, @path,
+      ( @baseFileId, @deltaFileId, @path, @size,
         @flagHash, @format, @lineCount, @time, 
         @additions, @modifications, @deletions
       )`

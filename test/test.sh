@@ -20,6 +20,7 @@ docker run -d --rm -t \
   -v=$SCRIPT_DIR/../:/app \
   -v=csv_diff_server_node_modules:/app/node_modules \
   -e APP_ENV=test \
+  -e LOG_MODE=local \
   -e PATHS_URL=http://localhost:3001 \
   -e PORT=3001 \
   -w=/app \

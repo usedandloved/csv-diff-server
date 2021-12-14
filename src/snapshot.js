@@ -26,7 +26,7 @@ const processSnapshot = async (
 
   // Does dbFile exist?
   if (!file) {
-    file = { dataset, source, revision, path: null };
+    file = { dataset, source, revision, path: null, size: null };
     try {
       await File.Create(file);
       // Get the file (with id).
@@ -56,7 +56,11 @@ const processSnapshot = async (
     const target = `${paths.data}/${dataset}/snapshots/${revision}.csv`;
 
     try {
-      file.path = await downloadFile(source, target, { fileHeaders: headers });
+      const downloadedFile = await downloadFile(source, target, {
+        fileHeaders: headers,
+      });
+      file = { ...file, ...downloadedFile };
+      // logger.debug({ file });
     } catch (e) {
       logger.error(e);
       throw e;
@@ -72,6 +76,7 @@ const processSnapshot = async (
   }
 
   // TODO: mode stuff here
+  // logger.debug(file);
 
   return { file, done };
 };

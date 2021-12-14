@@ -51,7 +51,9 @@ const downloadFile = async (source, target, options = {}) => {
         } else {
           res.body.pipe(dest);
         }
-        res.body.on('end', () => resolve(target));
+        const { size } = fs.statSync(target);
+
+        res.body.on('end', () => resolve({ path: target, size }));
         dest.on('error', (e) => reject(e));
       })
   );

@@ -4,7 +4,7 @@ const getFile = async (db) => {
   // return { Create: '' };
 
   const insert = db.prepare(
-    'INSERT INTO file ( path, dataset, revision, source) VALUES (@path,@dataset,@revision,@source)'
+    'INSERT INTO file ( path, dataset, revision, source, size) VALUES (@path,@dataset,@revision,@source,@size)'
   );
 
   const get = db.prepare('SELECT * FROM file WHERE path = (@path)');
@@ -20,7 +20,8 @@ const getFile = async (db) => {
   );
 
   const updateByDatasetRevision = db.prepare(
-    `UPDATE file SET path = (@path) 
+    `UPDATE file 
+     SET path = (@path), size = (@size) 
      WHERE dataset = (@dataset) AND revision = (@revision)`
   );
 
@@ -30,7 +31,7 @@ const getFile = async (db) => {
 
   return {
     Create: (params) => {
-      // logger.debug('creating csv', params);
+      // logger.debug(params, 'creating csv');
       return insert.run(params);
     },
 
@@ -51,7 +52,7 @@ const getFile = async (db) => {
       return update.run(params);
     },
     UpdateByDatasetRevision: (params) => {
-      // logger.debug('creating csv', params);
+      // logger.debug(params, 'updateByDatasetRevision csv');
       return updateByDatasetRevision.run(params);
     },
     Delete: (params) => {

@@ -35,24 +35,24 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
   //   let stmt = '';
   //   stmt = db.prepare(`PRAGMA foreign_keys = 0`);
   //   stmt.run();
-  //   // stmt = db.prepare(`DELETE FROM diff`);
-  //   // stmt.run();
-  //   // stmt = db.prepare(`DROP TABLE diff `);
-  //   // stmt.run();
+  //   stmt = db.prepare(`DELETE FROM diff`);
+  //   stmt.run();
+  //   stmt = db.prepare(`DROP TABLE diff `);
+  //   stmt.run();
   //   stmt = db.prepare(`DELETE FROM dist`);
   //   stmt.run();
   //   stmt = db.prepare(`DROP TABLE dist`);
   //   stmt.run();
-  //   // stmt = db.prepare(`DELETE FROM file`);
-  //   // stmt.run();
-  //   // stmt = db.prepare(`DROP TABLE file `);
-  //   // stmt.run();
+  //   stmt = db.prepare(`DELETE FROM file`);
+  //   stmt.run();
+  //   stmt = db.prepare(`DROP TABLE file `);
+  //   stmt.run();
   //   stmt = db.prepare(`PRAGMA foreign_keys = 1`);
   //   stmt.run();
 
-  //   // tableNames.splice(tableNames.indexOf('diff'), 1);
-  //   // tableNames.splice(tableNames.indexOf('dist'), 1);
-  //   // tableNames.splice(tableNames.indexOf('file'), 1);
+  //   tableNames.splice(tableNames.indexOf('diff'), 1);
+  //   tableNames.splice(tableNames.indexOf('dist'), 1);
+  //   tableNames.splice(tableNames.indexOf('file'), 1);
   // } catch (e) {
   //   logger.error(e);
   // }

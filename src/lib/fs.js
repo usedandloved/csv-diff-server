@@ -37,7 +37,7 @@ const withUrls = (data) => {
 const downloadFile = async (source, target, options = {}) => {
   await fs.ensureDir(path.dirname(target));
 
-  return await fetch(source).then(
+  await fetch(source).then(
     (res) =>
       new Promise(async (resolve, reject) => {
         const dest = fs.createWriteStream(target);
@@ -51,12 +51,15 @@ const downloadFile = async (source, target, options = {}) => {
         } else {
           res.body.pipe(dest);
         }
-        const { size } = fs.statSync(target);
 
-        res.body.on('end', () => resolve({ path: target, size }));
+        res.body.on('end', () => resolve());
         dest.on('error', (e) => reject(e));
       })
   );
+
+  const { size } = fs.statSync(target);
+
+  return { path: target, size };
 };
 
 const isDistPathsIsMissing = async (dists) => {

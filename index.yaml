@@ -4,8 +4,18 @@ entries:
   - annotations:
       category: CMS
     apiVersion: v2
+    appVersion: 0.0.9
+    created: "2022-01-17T16:53:25.734575Z"
+    digest: 652c6d7f5a9f3214efec1b00187ec2322c3b7f4e9183f0d11ce707f34420ef31
+    name: csv-diff-server
+    urls:
+    - packages/csv-diff-server-0.0.9.tgz
+    version: 0.0.9
+  - annotations:
+      category: CMS
+    apiVersion: v2
     appVersion: 0.0.8
-    created: "2021-12-10T13:34:17.670732Z"
+    created: "2022-01-17T16:53:25.733176Z"
     digest: dff4e5357466f83936a964b8c73992f1c33b9abbf876ce60b8f456548cedd03c
     name: csv-diff-server
     urls:
@@ -15,7 +25,7 @@ entries:
       category: CMS
     apiVersion: v2
     appVersion: 0.0.6
-    created: "2021-12-10T13:34:17.669555Z"
+    created: "2022-01-17T16:53:25.73174Z"
     digest: 3f51276230fa5d586b4628cf52a6321fad584038fef6ba4d5f37505a4ed9f3de
     name: csv-diff-server
     urls:
@@ -25,7 +35,7 @@ entries:
       category: CMS
     apiVersion: v2
     appVersion: 0.0.5
-    created: "2021-12-10T13:34:17.668652Z"
+    created: "2022-01-17T16:53:25.730112Z"
     digest: 30285fe4a727b5519067bc8a42d723e1085fef613d319db7578d342cd041c37a
     name: csv-diff-server
     urls:
@@ -35,7 +45,7 @@ entries:
       category: CMS
     apiVersion: v2
     appVersion: 0.0.4
-    created: "2021-12-10T13:34:17.667552Z"
+    created: "2022-01-17T16:53:25.728202Z"
     digest: 9b221cb8b5ef29c719e3cf313930d2623cd3b4825faefc1a90af26d953d16762
     name: csv-diff-server
     urls:
@@ -45,7 +55,7 @@ entries:
       category: CMS
     apiVersion: v2
     appVersion: 0.0.3
-    created: "2021-12-10T13:34:17.666593Z"
+    created: "2022-01-17T16:53:25.726968Z"
     digest: bf1ff42c47c1360ad18ccd3a1abeca6fa910c8931826e6037ad6ce1150f301b5
     name: csv-diff-server
     urls:
@@ -55,10 +65,10 @@ entries:
       category: CMS
     apiVersion: v2
     appVersion: 0.0.2
-    created: "2021-12-10T13:34:17.665582Z"
+    created: "2022-01-17T16:53:25.725486Z"
     digest: 9efe2b0c801ef90d664acae60305e2cdbf9709a17d3008a254698390fd06c993
     name: csv-diff-server
     urls:
     - packages/csv-diff-server-0.0.2.tgz
     version: 0.0.2
-generated: "2021-12-10T13:34:17.664271Z"
+generated: "2022-01-17T16:53:25.723127Z"

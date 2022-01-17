@@ -13,9 +13,16 @@
       </div> -->
 
       <style>
+        table {
+          width: 100%;
+        }
         th,
         td {
           padding: 3px;
+        }
+        th:last-of-type,
+        td:last-of-type {
+          text-align: right;
         }
         pre {
           margin-bottom: 0;
@@ -46,7 +53,7 @@
               </a>
             </td>
             <td><pre><%= (file.size / 1024000).toFixed(1) %></pre></td>
-            <td><pre><%= file.createdAt %></pre></td>
+            <td><pre><%= new Date(file.createdAt * 1000).toISOString().slice(0, -8) %></pre></td>
           </tr>
           <% }); %>
         </tbody>
@@ -90,7 +97,7 @@
             </td>
             <td><pre><%= msToTime(diff.time) %></pre></td>
             <td><pre><%= (diff.size / 1024000).toFixed(1) %></pre></td>
-            <td><pre><%= diff.createdAt %></pre></td>
+            <td><pre><%= new Date(diff.createdAt * 1000).toISOString().slice(0, -8) %></pre></td>
           </tr>
           <% }); %>
         </tbody>
@@ -131,7 +138,7 @@
             </td>
             <td><pre><%= msToTime(dist.time) %></td></pre>
             <td><pre><%= (dist.size / 1024000).toFixed(1) %></td></pre>
-            <td><pre><%= dist.createdAt %></td></pre>
+            <td><pre><%= new Date(dist.createdAt * 1000).toISOString().slice(0, -8) %></pre></td>
           </tr>
           <% }); %>
         </tbody>

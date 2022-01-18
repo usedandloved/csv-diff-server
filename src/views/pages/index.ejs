@@ -124,6 +124,7 @@
             <th>Url</th>
             <th>Time</th>
             <th>Size MB</th>
+            <th>Lines</th>
             <th>Created at</th>
           </tr>
         </thead>
@@ -138,6 +139,7 @@
             </td>
             <td><pre><%= msToTime(dist.time) %></td></pre>
             <td><pre><%= (dist.size / 1024000).toFixed(1) %></td></pre>
+            <td><pre><%= (dist.lineCount) %></td></pre>
             <td><pre><%= new Date(dist.createdAt * 1000).toISOString().slice(0, -8) %></pre></td>
           </tr>
           <% }); %>

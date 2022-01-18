@@ -31,31 +31,30 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
     logger.error(e);
   }
 
-  // try {
-  //   let stmt = '';
-  //   stmt = db.prepare(`PRAGMA foreign_keys = 0`);
-  //   stmt.run();
-  //   stmt = db.prepare(`DELETE FROM diff`);
-  //   stmt.run();
-  //   stmt = db.prepare(`DROP TABLE diff `);
-  //   stmt.run();
-  //   stmt = db.prepare(`DELETE FROM dist`);
-  //   stmt.run();
-  //   stmt = db.prepare(`DROP TABLE dist`);
-  //   stmt.run();
-  //   stmt = db.prepare(`DELETE FROM file`);
-  //   stmt.run();
-  //   stmt = db.prepare(`DROP TABLE file `);
-  //   stmt.run();
-  //   stmt = db.prepare(`PRAGMA foreign_keys = 1`);
-  //   stmt.run();
-
-  //   tableNames.splice(tableNames.indexOf('diff'), 1);
-  //   tableNames.splice(tableNames.indexOf('dist'), 1);
-  //   tableNames.splice(tableNames.indexOf('file'), 1);
-  // } catch (e) {
-  //   logger.error(e);
-  // }
+  try {
+    // let stmt = '';
+    // stmt = db.prepare(`PRAGMA foreign_keys = 0`);
+    // stmt.run();
+    // stmt = db.prepare(`DELETE FROM diff`);
+    // stmt.run();
+    // stmt = db.prepare(`DROP TABLE diff `);
+    // stmt.run();
+    // stmt = db.prepare(`DELETE FROM dist`);
+    // stmt.run();
+    // stmt = db.prepare(`DROP TABLE dist`);
+    // stmt.run();
+    // stmt = db.prepare(`DELETE FROM file`);
+    // stmt.run();
+    // stmt = db.prepare(`DROP TABLE file `);
+    // stmt.run();
+    // stmt = db.prepare(`PRAGMA foreign_keys = 1`);
+    // stmt.run();
+    // tableNames.splice(tableNames.indexOf('diff'), 1);
+    // tableNames.splice(tableNames.indexOf('dist'), 1);
+    // tableNames.splice(tableNames.indexOf('file'), 1);
+  } catch (e) {
+    logger.error(e);
+  }
 
   // logger.debug({ tableNames });
 
@@ -119,6 +118,7 @@ const getDb = async ({ target = 'data/default.db' } = {}) => {
       diffState       text       NOT NULL,
       time            INTEGER,
       size            INTEGER,
+      lineCount       INTEGER,
       createdAt       integer(4) not null default (strftime('%s','now')), 
       FOREIGN KEY (diffId) 
         REFERENCES diff(id) ON DELETE CASCADE

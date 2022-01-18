@@ -6,10 +6,10 @@ const getDist = async (db) => {
   const insert = db.prepare(
     ` 
     INSERT INTO dist 
-      ( diffId, fileId, path, size, diffState, postProcessHash, time
+      ( diffId, fileId, path, size, diffState, postProcessHash, time, lineCount
       ) 
     VALUES
-      ( @diffId, @fileId, @path, @size, @diffState, @postProcessHash, @time
+      ( @diffId, @fileId, @path, @size, @diffState, @postProcessHash, @time, @lineCount
       )`
   );
 

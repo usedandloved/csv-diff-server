@@ -67,6 +67,13 @@ const sample7 = {
   path: null,
 };
 
+const sample8 = {
+  dataset: 'mmp',
+  revision: 'book-ids',
+  source: `${paths.url}/test/delta-mmp-book-ids.csv`,
+  path: null,
+};
+
 describe.only('Server diff 2 ', () => {
   let app, db, deleteAllDist, deleteAllDiff, deleteAllFile;
 
@@ -243,6 +250,7 @@ describe.only('Server diff 2 ', () => {
         'time',
         'diffId',
         'size',
+        'lineCount',
       ])
       .to.deep.equal(postDiffSmallResponse({ body }));
 
@@ -417,4 +425,92 @@ describe.only('Server diff 2 ', () => {
 
     expect(actualLineCount).to.equal(expectedLineCount);
   }).timeout(60000);
+
+  xit('post : diff undefined base, ids for reconciliation', async () => {
+    const body = {
+      base: {
+        dataset: sample8.revision,
+        source: sample8.source,
+        revision: sample8.revision,
+      },
+      delta: undefined,
+      flags: {
+        format: 'rowmark',
+      },
+      postProcess: {
+        batchSize: 10000000,
+        transforms: `{
+          "merchant_product_id" : merchant_product_id
+        }`,
+      },
+    };
+
+    // One liner to make sure file is being served.
+    expect((await fetch(body.base.source)).status).to.equal(200);
+
+    let apiResponse,
+      apiJson,
+      i = 0,
+      intervalSeconds = 10;
+
+    while (
+      !i ||
+      typeof apiJson !== 'object' ||
+      (i < 100 && Object.values(apiJson).find((x) => x.progress))
+    ) {
+      console.log(`Loading seconds: ${i * intervalSeconds}`);
+      if (i++) await waitSeconds(intervalSeconds);
+      if (i % 20 === 0) {
+        console.log(
+          { apiJson },
+          `Slow response from csv-diff-server api/diff, seconds: ${
+            i * intervalSeconds
+          }`
+        );
+      }
+      try {
+        apiResponse = apiResponse = await fetch(`${paths.url}/api/diff`, {
+          method: 'post',
+          body: JSON.stringify(body),
+          headers: { 'Content-Type': 'application/json' },
+        });
+        apiJson = await apiResponse.json();
+      } catch (e) {
+        console.error(
+          { apiResponse },
+          'Error fetching from csv-diff-server api/diff'
+        );
+        console.error(e);
+      }
+    }
+
+    // return;
+    expect(apiJson.dists.length).to.equal(1);
+
+    const baseFile = await fs.readFile(apiJson.base.file.path);
+    const baseFileLines = `${baseFile}`.split('\n');
+
+    const expectedLineCount = baseFileLines.length;
+
+    const dist = apiJson.dists[0];
+
+    const distResponse = await fetch(dist.url);
+    const distText = await distResponse.text();
+
+    const distIds = distText.split('\n');
+    expect(distIds.length).to.equal(expectedLineCount);
+
+    let idsMatch = true;
+
+    for (let i = 0; i < distIds.length; i++) {
+      // Test that the id on this line of the dist is in the base.
+      if (!baseFileLines[i].includes(distIds[i])) {
+        idsMatch = false;
+        break;
+      }
+    }
+    expect(idsMatch).to.equal(true);
+
+    return;
+  }).timeout(600000); // 6 mins
 });

@@ -52,8 +52,15 @@ const downloadFile = async (source, target, options = {}) => {
           res.body.pipe(dest);
         }
 
-        res.body.on('end', () => resolve());
+        let endFinishCount = 0;
+        const maybeResolve = () => {
+          // Only resolve after end of source and nd of write stream
+          if (endFinishCount++) resolve();
+        };
+
         dest.on('error', (e) => reject(e));
+        res.body.on('end', () => maybeResolve());
+        dest.on('finish', (e) => maybeResolve());
       })
   );
 

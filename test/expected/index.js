@@ -36,6 +36,7 @@ const postDiffTestResponse = ({ body }) => ({
       postProcessHash: 'COrKaogL2uaaPL3sNW5hJIvubwAevfThs5vUJ31tI60',
       url: 'http://localhost:3001/data/sample/v1-v2-yHAQmz/dist-COrKao/modified-0-rowmark.csv',
       size: 19,
+      lineCount: 1,
     },
   ],
 });

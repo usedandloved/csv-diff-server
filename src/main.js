@@ -199,14 +199,19 @@ export default async (params, File, Diff, Dist, updateResponse) => {
 
       dists = dists.map((obj) => {
         const { size } = fs.statSync(obj.path);
+        const contents = fs.readFileSync(obj.path);
+        const lineCount = `${contents}`.split('\n').length;
         return {
           ...obj,
           diffId: diff.id,
           fileId: diff.id ? null : base.file.id,
           postProcessHash,
-          size: size,
+          size,
+          lineCount,
         };
       });
+
+      // console.log(dists);
 
       try {
         Dist.CreateMany(dists);
